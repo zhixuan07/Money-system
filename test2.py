@@ -401,9 +401,24 @@ class Homepage(Frame):
             window = AddTransaction(self,controller)
             window.grab_set()
         
-       
+        def show(self):
+            self.start_date = self.start_date.get_date()
+            self.str_date = self.start_date.strftime("%Y-%m-%d")
+            self.end_date = self.end_date.get_date()
+            self.end_date = self.end_date.strftime("%Y-%m-%d")
+            conn = sqlite3.connect('money.db')
+            cursor = conn.cursor()
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Transaction_record
+                                WHERE Email=? AND Category='Income' AND Date BETWEEN ? AND ?
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.str_date,self.end_date,))
 
-       
+            data = cursor.fetchall()
+            income.set(data[0])            
+        #=====Int variable
+        income =IntVar()
+
+        
         # ================= homepage Frame =================
         self.navbar_frame = Frame(self, bg='#ffffff', width='2500', height='65')
         self.navbar_frame.place(x=0, y=5)
@@ -446,8 +461,16 @@ class Homepage(Frame):
         self.agn_button_label = Label(self, image=photo, bg='#11DD7B')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=30, y=125)
-        
 
+        self.start_date= DateEntry(self,width=10,font=("Arial", 12))
+        self.start_date.place(x=700,y=125)
+
+
+        self.end_date= DateEntry(self,width=10,font=("Arial", 12))
+        self.end_date.place(x=800,y=125)
+        
+        self.show = Button(self,width=10,text='show',command=lambda:show(self))
+        self.show.place(x=500,y=125)
         self.acc = Button(self.agn_button_label, text='Add Transaction', font=('yu gothic ui', 13, 'bold'), width=15, bd=0,
                           bg='#11DD7B', cursor='hand2', activebackground='#11DD7B', fg='white',command= lambda:open_add(self))
         self.acc.place(x=50, y=5)
@@ -474,7 +497,7 @@ class Homepage(Frame):
                           bd=0,
                           bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
         self.acc.place(x=70, y=8)
-        self.ac = Button(self.agn_button_label, text='-100MYR', font=('yu gothic ui', 13, 'bold'), width=10,
+        self.ac = Label(self.agn_button_label,text='', font=('yu gothic ui', 13, 'bold'), width=10,textvariable=income,
                          bd=0,
                          bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
         self.ac.place(x=330, y=8)
@@ -923,7 +946,7 @@ class AddTransaction(Toplevel):
     def __init__(self,window,controller):
         Toplevel.__init__(self,window)
         self.geometry('1000x500')
-        category_list =['Food&Drink','Cars','Home','Shopping']
+        category_list =['Food&Drink','Cars','Home','Travel','Shopping','Salary','Loan','Investment','Saving']
         currency_list = ['MYR','USD','CAD','EUR','SG','CNH','JPY','GBP','CHF','AUD']
 
         self.controller= controller
@@ -931,12 +954,12 @@ class AddTransaction(Toplevel):
 
         def add(self):
             email = self.controller.shared_email['Login_email'].get()
-            
             self.category = self.category.get()
             self.note = self.note.get()
             self.amount = self.amount.get()
             self.currency = self.currency.get()
             self.date = self.date.get_date()
+            self.str_date = self.date.strftime("%Y-%m-%d")
 
             conn = sqlite3.connect('money.db')
             cursor = conn.cursor()
@@ -945,10 +968,20 @@ class AddTransaction(Toplevel):
                 mb.showerror('Error','Please fill in the blank!')
             elif self.amount <= 0:
                 mb.showerror('Error','The amount cannot less than zero!')
-            else:
-                cursor.execute('INSERT INTO Transaction_record (Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.date,self.note,self.amount,self.currency))
+            elif self.category =='Salary' or self.category == 'Loan' or self.category == 'Investment':
+                cursor.execute('INSERT INTO Income(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,self.amount,self.currency))
                 conn.commit()
                 mb.showinfo('Success','Commit success')
+            elif self.category =='Food&Drink' or self.category == 'Travel' or self.category == 'Cars' or self.category == 'Shopping' or self.category == 'Home':
+                cursor.execute('INSERT INTO Expenses(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,self.amount,self.currency))
+                conn.commit()
+                mb.showinfo('Success','Commit success') 
+            elif self.category =='Saving' :
+                cursor.execute('INSERT INTO Saving(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,self.amount,self.currency))
+                conn.commit()
+                mb.showinfo('Success','Commit success')
+            else:
+                mb.showerror('Error','Error')
 
         self.category =  StringVar()
         self.note = StringVar()
