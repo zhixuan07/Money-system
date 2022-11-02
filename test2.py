@@ -1,6 +1,4 @@
 from email import message
-from multiprocessing.forkserver import SIGNED_STRUCT
-from pickle import FRAME
 from tkinter.ttk import * 
 from tkinter import *
 import tkinter as tk
@@ -12,7 +10,13 @@ import tkinter.messagebox as mb
 import sqlite3
 from tkinter.messagebox import askyesno
 from tkcalendar import DateEntry
-import os
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
+NavigationToolbar2Tk)
+import pandas as pd
+import numpy as np
+
 
 
 
@@ -395,28 +399,152 @@ class Homepage(Frame):
         self.controller=controller
         self.hide_button = None
 
-       
-
+    
         def open_add(self):
             window = AddTransaction(self,controller)
             window.grab_set()
-        
+
+        def reset(self):
+            self.start_date_calender.delete(0,'end')
+            self.end_date_calender.delete(0,'end')
+
         def show(self):
-            self.start_date = self.start_date.get_date()
-            self.str_date = self.start_date.strftime("%Y-%m-%d")
-            self.end_date = self.end_date.get_date()
-            self.end_date = self.end_date.strftime("%Y-%m-%d")
+            self.start_date = self.start_date_calender.get_date()
+            self.start_date_str = self.start_date.strftime("%Y-%m-%d")
+            self.end_date = self.end_date_calender.get_date()
+            self.end_date_str = self.end_date.strftime("%Y-%m-%d")
             conn = sqlite3.connect('money.db')
             cursor = conn.cursor()
-            cursor.execute('''SELECT SUM(Amount)
-                                FROM Transaction_record
-                                WHERE Email=? AND Category='Income' AND Date BETWEEN ? AND ?
-                                 ''',(self.controller.shared_email['Login_email'].get(),self.str_date,self.end_date,))
 
-            data = cursor.fetchall()
-            income.set(data[0])            
+            #========== Income chart ===========
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Income
+                                WHERE Email=? AND Date BETWEEN ? AND ? AND Category='Salary'
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            salary_data = cursor.fetchall()
+          
+            if len(salary_data) == 0:
+                salary.set(0)
+            else: 
+                salary.set(salary_data[0])
+
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Income
+                                WHERE Email=? AND Date BETWEEN ? AND ? AND Category='Loan'
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            loan_data = cursor.fetchall()
+            if len(loan_data) == 0:
+                loan.set(0)
+            else: 
+                loan.set(loan_data[0])
+
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Income
+                                WHERE Email=? AND Date BETWEEN ? AND ? AND Category='Investment'
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            invest_data = cursor.fetchall()
+            if len(invest_data) == 0:
+                investment.set(0)
+            else: 
+                investment.set(invest_data[0])
+
+            cursor.execute('''SELECT Category ,SUM(Amount)
+                                FROM Income
+                                WHERE Email=? AND Date BETWEEN ? AND ?
+                                GROUP BY Category 
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            
+            income_graph_data=cursor.fetchall()   
+           
+            df1 = pd.DataFrame(income_graph_data,columns=['Category','Amount'])
+            
+       
+            fig = Figure(figsize=(3,3)) # create a figure object
+            ax = fig.add_subplot(111) # add an Axes to the figure
+
+            ax.pie(df1['Amount'], radius=1, labels=df1['Category'], colors=['wheat','salmon','greenyellow'],wedgeprops={'width':0.3}, 
+                startangle=90,)
+            
+
+            chart1 = FigureCanvasTkAgg(fig,self.a_frame)
+            chart1.get_tk_widget().place(relx=0.17,rely=0.01)
+           
+            #====== Expenses chart
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Expenses
+                                WHERE Email=? AND Date BETWEEN ? AND ? AND Category='Home'
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            home_data = cursor.fetchall()
+          
+            if len(home_data) == 0:
+                salary.set(0)
+            else: 
+                home.set(home_data[0])
+
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Expenses
+                                WHERE Email=? AND Date BETWEEN ? AND ? AND Category='Travel'
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            travel_data = cursor.fetchall()
+          
+            if len(travel_data) == 0:
+                travel.set(0)
+            else: 
+                travel.set(travel_data[0])
+
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Expenses
+                                WHERE Email=? AND Date BETWEEN ? AND ? AND Category='Shopping'
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            shopping_data = cursor.fetchall()
+          
+            if len(shopping_data) == 0:
+                shopping.set(0)
+            else: 
+                shopping.set(shopping_data[0])  
+
+            cursor.execute('''SELECT Category , SUM(Amount)
+                            FROM Expenses
+                            WHERE Email=? AND Date BETWEEN ? AND ?
+                            GROUP BY Category
+                            ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Expenses
+                                WHERE Email=? AND Date BETWEEN ? AND ? AND Category='Food&Drink'
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            food_data = cursor.fetchall()
+          
+            if len(food_data) == 0:
+                food.set(0)
+            else: 
+                food.set(food_data[0])
+
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Expenses
+                                WHERE Email=? AND Date BETWEEN ? AND ? AND Category='Transport'
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            transport_data = cursor.fetchall()
+          
+            if len(transport_data) == 0:
+                transport.set(0)
+            else: 
+                transport.set(transport_data[0])
+                             
+
         #=====Int variable
-        income =IntVar()
+        salary=IntVar()
+        loan = IntVar()
+        investment = IntVar()
+        home = IntVar()
+        travel = IntVar()
+        food = IntVar()
+        shopping = IntVar()
+        transport =IntVar()
+
+
+        self.str_date=StringVar()
+        self.end_date=StringVar()
 
         
         # ================= homepage Frame =================
@@ -462,15 +590,19 @@ class Homepage(Frame):
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=30, y=125)
 
-        self.start_date= DateEntry(self,width=10,font=("Arial", 12))
-        self.start_date.place(x=700,y=125)
+        self.start_date_calender = DateEntry(self,width=10,font=("Arial", 12),textvariable=self.str_date)
+        self.start_date_calender.place(x=700,y=125)
 
 
-        self.end_date= DateEntry(self,width=10,font=("Arial", 12))
-        self.end_date.place(x=800,y=125)
+        self.end_date_calender= DateEntry(self,width=10,font=("Arial", 12),textvariable=self.end_date)
+        self.end_date_calender.place(x=800,y=125)
         
         self.show = Button(self,width=10,text='show',command=lambda:show(self))
         self.show.place(x=500,y=125)
+
+        self.reset =Button(self,width=10,text='Reset',command= lambda:reset(self))
+        self.reset.place(x=400,y=125)
+        
         self.acc = Button(self.agn_button_label, text='Add Transaction', font=('yu gothic ui', 13, 'bold'), width=15, bd=0,
                           bg='#11DD7B', cursor='hand2', activebackground='#11DD7B', fg='white',command= lambda:open_add(self))
         self.acc.place(x=50, y=5)
@@ -487,19 +619,19 @@ class Homepage(Frame):
         self.Savings_label = Label(self.c_frame, text='Savings', bg='#FFFFFF', font=('yu gothic ui', 16, 'bold'),
                                   fg='#000000')
         self.Savings_label.place(x=16, y=10)
-        #==============================
+        #============================== Income Card =============================
         self.agn_button = Image.open('images/16.jpg')
         photo = ImageTk.PhotoImage(self.agn_button)
         self.agn_button_label = Label(self.a_frame, image=photo, bg='#FFFFFF')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=0, y=305)
-        self.acc = Button(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
+        self.acc = Button(self.agn_button_label, text='Salary', font=('yu gothic ui', 13, 'bold'), width=15,
                           bd=0,
                           bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
         self.acc.place(x=70, y=8)
-        self.ac = Label(self.agn_button_label,text='', font=('yu gothic ui', 13, 'bold'), width=10,textvariable=income,
+        self.ac = Label(self.agn_button_label,text='', font=('yu gothic ui', 13, 'bold'), width=10,textvariable=salary,
                          bd=0,
-                         bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
+                         bg='#FFFFFF')
         self.ac.place(x=330, y=8)
 
         self.agn_button = Image.open('images/1.jpg')
@@ -513,13 +645,13 @@ class Homepage(Frame):
         self.agn_button_label = Label(self.a_frame, image=photo, bg='#FFFFFF')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=0, y=361)
-        self.acc = Button(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
+        self.acc = Button(self.agn_button_label, text='Loan', font=('yu gothic ui', 13, 'bold'), width=15,
                           bd=0,
                           bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
         self.acc.place(x=70, y=8)
-        self.ac = Button(self.agn_button_label, text='-100MYR', font=('yu gothic ui', 13, 'bold'), width=10,
+        self.ac = Label(self.agn_button_label, text='', font=('yu gothic ui', 13, 'bold'), width=10,textvariable=loan,
                          bd=0,
-                         bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
+                         bg='#FFFFFF')
         self.ac.place(x=330, y=8)
 
         self.agn_button = Image.open('images/2.jpg')
@@ -533,13 +665,13 @@ class Homepage(Frame):
         self.agn_button_label = Label(self.a_frame, image=photo, bg='#FFFFFF')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=0, y=418)
-        self.acc = Button(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
+        self.acc = Label(self.agn_button_label, text='Invesment', font=('yu gothic ui', 13, 'bold'), width=15,
                           bd=0,
                           bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
         self.acc.place(x=70, y=8)
-        self.ac = Button(self.agn_button_label, text='-100MYR', font=('yu gothic ui', 13, 'bold'), width=10,
+        self.ac = Label(self.agn_button_label, text='', font=('yu gothic ui', 13, 'bold'), width=10,textvariable=investment,
                           bd=0,
-                          bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
+                          bg='#FFFFFF')
         self.ac.place(x=330, y=8)
 
         self.agn_button = Image.open('images/4.jpg')
@@ -549,19 +681,19 @@ class Homepage(Frame):
         self.agn_button_label.place(x=20, y=431)
 
         #======B frame detail========
-        # ==============================
+        # ============================== Expenses Card =======================
         self.agn_button = Image.open('images/16.jpg')
         photo = ImageTk.PhotoImage(self.agn_button)
         self.agn_button_label = Label(self.b_frame, image=photo, bg='#FFFFFF')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=0, y=305)
-        self.acc = Button(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
+        self.acc = Label(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
                           bd=0,
-                          bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
+                          bg='#FFFFFF')
         self.acc.place(x=70, y=8)
-        self.ac = Button(self.agn_button_label, text='-100MYR', font=('yu gothic ui', 13, 'bold'), width=10,
+        self.ac = Label(self.agn_button_label, text='',textvariable=home, font=('yu gothic ui', 13, 'bold'), width=10,
                          bd=0,
-                         bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
+                         bg='#FFFFFF')
         self.ac.place(x=330, y=8)
 
         self.agn_button = Image.open('images/5.jpg')
@@ -575,13 +707,13 @@ class Homepage(Frame):
         self.agn_button_label = Label(self.b_frame, image=photo, bg='#FFFFFF')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=0, y=361)
-        self.acc = Button(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
+        self.acc = Label(self.agn_button_label, text='Travel', font=('yu gothic ui', 13, 'bold'), width=15,
                           bd=0,
-                          bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
+                          bg='#FFFFFF')
         self.acc.place(x=70, y=8)
-        self.ac = Button(self.agn_button_label, text='-100MYR', font=('yu gothic ui', 13, 'bold'), width=10,
+        self.ac = Label(self.agn_button_label, text='',textvariable=travel, font=('yu gothic ui', 13, 'bold'), width=10,
                          bd=0,
-                         bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
+                         bg='#FFFFFF')
         self.ac.place(x=330, y=8)
 
         self.agn_button = Image.open('images/6.jpg')
@@ -595,13 +727,13 @@ class Homepage(Frame):
         self.agn_button_label = Label(self.b_frame, image=photo, bg='#FFFFFF')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=0, y=418)
-        self.acc = Button(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
+        self.acc = Label(self.agn_button_label, text='Shopping', font=('yu gothic ui', 13, 'bold'), width=15,
                           bd=0,
-                          bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
+                          bg='#FFFFFF')
         self.acc.place(x=70, y=8)
-        self.ac = Button(self.agn_button_label, text='-100MYR', font=('yu gothic ui', 13, 'bold'), width=10,
+        self.ac = Label(self.agn_button_label, text='',textvariable=shopping, font=('yu gothic ui', 13, 'bold'), width=10,
                          bd=0,
-                         bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
+                         bg='#FFFFFF')
         self.ac.place(x=330, y=8)
 
         self.agn_button = Image.open('images/7.jpg')
@@ -615,13 +747,13 @@ class Homepage(Frame):
         self.agn_button_label = Label(self.b_frame, image=photo, bg='#FFFFFF')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=0, y=475)
-        self.acc = Button(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
+        self.acc = Label(self.agn_button_label, text='Food & Beverage', font=('yu gothic ui', 13, 'bold'), width=15,
                           bd=0,
                           bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
         self.acc.place(x=70, y=8)
-        self.ac = Button(self.agn_button_label, text='-100MYR', font=('yu gothic ui', 13, 'bold'), width=10,
+        self.ac = Label(self.agn_button_label, text='',textvariable=food, font=('yu gothic ui', 13, 'bold'), width=10,
                          bd=0,
-                         bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
+                         bg='#FFFFFF')
         self.ac.place(x=330, y=8)
 
         self.agn_button = Image.open('images/8.jpg')
@@ -635,13 +767,13 @@ class Homepage(Frame):
         self.agn_button_label = Label(self.b_frame, image=photo, bg='#FFFFFF')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=0, y=532)
-        self.acc = Button(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
+        self.acc = Label(self.agn_button_label, text='Transport', font=('yu gothic ui', 13, 'bold'), width=15,
                           bd=0,
                           bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
         self.acc.place(x=70, y=8)
-        self.ac = Button(self.agn_button_label, text='-100MYR', font=('yu gothic ui', 13, 'bold'), width=10,
+        self.ac = Label(self.agn_button_label, text='',textvariable=transport, font=('yu gothic ui', 13, 'bold'), width=10,
                          bd=0,
-                         bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
+                         bg='#FFFFFF')
         self.ac.place(x=330, y=8)
 
         self.agn_button = Image.open('images/9.jpg')
@@ -1042,7 +1174,7 @@ class TransactionTable(Frame):
             self.tree.delete(*self.tree.get_children())
             conn = sqlite3.connect('money.db')
             cursor =conn.cursor()
-            cursor.execute('SELECT * FROM Transaction_record WHERE Email =?',(email,))
+            cursor.execute('SELECT Category,Date,Note,Amount,Currency FROM Transaction_record WHERE Email =?',(email,))
             data =cursor.fetchall()
             for record in data:
                 self.tree.insert('',END,values=record)
