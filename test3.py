@@ -1289,7 +1289,8 @@ class TransactionTable(Frame):
     def __init__(self,window,controller) :
         Frame.__init__(self,window)
         self.controller = controller 
-
+        self.category = StringVar()
+        category_list=['Salary','Loan','Investment','Home','Travel','Shopping','Food&Drink','Transport','Saving']
         
         def display_record(self):
             email = self.controller.shared_email['Login_email'].get()
@@ -1325,9 +1326,67 @@ class TransactionTable(Frame):
                     conn.commit()
                     mb.showinfo('Done', 'The record you wanted deleted was successfully deleted.')
                     display_record(self)
-        
-                
-        
+
+        def search_by_category(self):
+            conn =sqlite3.connect('money.db')
+            cursor = conn.cursor()
+            if self.category.get() == 'Salary':
+                self.tree.delete(*self.tree.get_children())
+                cursor.execute('SELECT Transaction_ID, Category,Date,Note,Amount,Currency FROM Income WHERE Email =?',(self.controller.shared_email['Login_email'].get()))
+                salary_data = cursor.fecthall()
+                for record in salary_data:
+                    self.tree.insert('',END,values=record)
+            elif self.category.get() == 'Loan':
+                self.tree.delete(*self.tree.get_children())
+                cursor.execute('SELECT Transaction_ID, Category,Date,Note,Amount,Currency FROM Income WHERE Email =?',(self.controller.shared_email['Login_email'].get()))
+                salary_data = cursor.fecthall()
+                for record in salary_data:
+                    self.tree.insert('',END,values=record)
+            elif self.category.get() == 'Investment':
+                self.tree.delete(*self.tree.get_children())
+                cursor.execute('SELECT Transaction_ID, Category,Date,Note,Amount,Currency FROM Income WHERE Email =?',(self.controller.shared_email['Login_email'].get()))
+                salary_data = cursor.fecthall()
+                for record in salary_data:
+                    self.tree.insert('',END,values=record)
+            elif self.category.get() == 'Home':
+                self.tree.delete(*self.tree.get_children())
+                cursor.execute('SELECT Transaction_ID, Category,Date,Note,Amount,Currency FROM Expenses WHERE Email =?',(self.controller.shared_email['Login_email'].get()))
+                salary_data = cursor.fecthall()
+                for record in salary_data:
+                    self.tree.insert('',END,values=record)
+            elif self.category.get() == 'Travel':
+                self.tree.delete(*self.tree.get_children())
+                cursor.execute('SELECT Transaction_ID, Category,Date,Note,Amount,Currency FROM Expenses WHERE Email =?',(self.controller.shared_email['Login_email'].get()))
+                salary_data = cursor.fecthall()
+                for record in salary_data:
+                    self.tree.insert('',END,values=record)
+            elif self.category.get() == 'Food&Drink':
+                self.tree.delete(*self.tree.get_children())
+                cursor.execute('SELECT Transaction_ID, Category,Date,Note,Amount,Currency FROM Expenses WHERE Email =?',(self.controller.shared_email['Login_email'].get()))
+                salary_data = cursor.fecthall()
+                for record in salary_data:
+                    self.tree.insert('',END,values=record)
+            elif self.category.get() == 'Transport':
+                self.tree.delete(*self.tree.get_children())
+                cursor.execute('SELECT Transaction_ID, Category,Date,Note,Amount,Currency FROM Expenses WHERE Email =?',(self.controller.shared_email['Login_email'].get()))
+                salary_data = cursor.fecthall()
+                for record in salary_data:
+                    self.tree.insert('',END,values=record)
+            elif self.category.get() == 'Shopping':
+                self.tree.delete(*self.tree.get_children())
+                cursor.execute('SELECT Transaction_ID, Category,Date,Note,Amount,Currency FROM Expenses WHERE Email =?',(self.controller.shared_email['Login_email'].get()))
+                salary_data = cursor.fecthall()
+                for record in salary_data:
+                    self.tree.insert('',END,values=record)
+            elif self.category.get() == 'Saving':
+                self.tree.delete(*self.tree.get_children())
+                cursor.execute('SELECT Transaction_ID, Category,Date,Note,Amount,Currency FROM Saving WHERE Email =?',(self.controller.shared_email['Login_email'].get()))
+                salary_data = cursor.fecthall()
+                for record in salary_data:
+                    self.tree.insert('',END,values=record)
+            else:
+                mb.showerror('Error','Please select one category')
+
         self.table_frame =Frame(self,bg='#FFFFFF',width='1760',height='800')
         self.table_frame.place(x=0,y=110)
 
@@ -1359,6 +1418,12 @@ class TransactionTable(Frame):
 
         self.delete_record= Button(self.table_frame,width=10,text='Delete',font=labelfont,command=lambda :delete_record(self))
         self.delete_record.place(x=350,y=60)
+
+        self.search_category= Button(self.table_frame,width=10,text='Search',font=labelfont,command=lambda :search_by_category(self))
+        self.search_category.place(x=490,y=60)
+
+        self.category_list = Combobox(self.table_frame,width=10,textvariable=self.category,values=category_list)
+        self.category_list.place(x=600,y=60)
 
         self.tree = Treeview(self.table_frame, height=100, selectmode=BROWSE,
                                 columns=('Transaction_ID','Category', 'Date', "Note","Amount", "Currency" ))
