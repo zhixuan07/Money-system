@@ -1296,10 +1296,34 @@ class TransactionTable(Frame):
             self.tree.delete(*self.tree.get_children())
             conn = sqlite3.connect('money.db')
             cursor =conn.cursor()
-            cursor.execute('SELECT * FROM Transaction_record WHERE Email =?',(email,))
+            cursor.execute('SELECT Transaction_ID,Category,Date,Note,Amount,Currency FROM Income WHERE Email =?',(email,))
             data =cursor.fetchall()
             for record in data:
                 self.tree.insert('',END,values=record)
+            cursor.execute('SELECT Transaction_ID,Category,Date,Note,Amount,Currency FROM Expenses WHERE Email =?',(email,))
+            data =cursor.fetchall()
+            for record in data:
+                self.tree.insert('',END,values=record)
+            
+        def delete_record(self):
+            conn = sqlite3.connect('money.db')
+            cursor =conn.cursor()
+            if not self.tree.selection():
+                 mb.showerror('Error!', 'Please select a record from the table')
+            else:
+                # Select the one row of the table
+                answer = askyesno(title='confirmation',
+                        message='Are you sure that you want to delete')
+                if answer:
+                    current_item = self.tree.focus()
+                    values = self.tree.item(current_item)
+                    selection = values["values"]
+                    self.tree.delete(current_item)
+                    cursor.execute('DELETE FROM Income WHERE Transaction_ID=%s' % selection[0])
+                    conn.commit()
+                    mb.showinfo('Done', 'The record you wanted deleted was successfully deleted.')
+                    display_record(self)
+                    
         
         self.table_frame =Frame(self,bg='#FFFFFF',width='1760',height='800')
         self.table_frame.place(x=0,y=110)
@@ -1330,13 +1354,17 @@ class TransactionTable(Frame):
         self.show = Button(self.table_frame,width=10,text='Show',font=labelfont,command=lambda:display_record(self))
         self.show.place(x=200,y=60)
 
+        self.delete_record= Button(self.table_frame,width=10,text='Delete',font=labelfont,command=lambda :delete_record(self))
+        self.delete_record.place(x=350,y=60)
+
         self.tree = Treeview(self.table_frame, height=100, selectmode=BROWSE,
-                                columns=('Category', 'Date', "Note","Amount", "Currency" ))
+                                columns=('Transaction_ID','Category', 'Date', "Note","Amount", "Currency" ))
         X_scroller = Scrollbar(self.tree, orient=HORIZONTAL, command=self.tree.xview)
         Y_scroller = Scrollbar(self.tree, orient=VERTICAL, command=self.tree.yview)
         X_scroller.pack(side=BOTTOM, fill=X)
         Y_scroller.pack(side=RIGHT, fill=Y)
         self.tree.config(yscrollcommand=Y_scroller.set, xscrollcommand=X_scroller.set)
+        self.tree.heading('Transaction_ID', text='Transaction_ID', anchor=CENTER)
         self.tree.heading('Category', text='Category', anchor=CENTER)
         self.tree.heading('Date', text='Date', anchor=CENTER)
         self.tree.heading('Note', text='Note', anchor=CENTER)
@@ -1344,17 +1372,18 @@ class TransactionTable(Frame):
         self.tree.heading('Currency', text='Currency', anchor=CENTER)
 
 
-        self.tree.column('#0', width=10, stretch=NO,anchor=CENTER)
+        self.tree.column('#0', width=20, stretch=NO,anchor=CENTER)
         self.tree.column('#1', width=70, stretch=NO,anchor=CENTER)
         self.tree.column('#2', width=100, stretch=NO,anchor=CENTER)
         self.tree.column('#3', width=150, stretch=NO,anchor=CENTER)
         self.tree.column('#4', width=80, stretch=NO,anchor=CENTER)
         self.tree.column('#5', width=80, stretch=NO,anchor=CENTER)
+        self.tree.column('#6', width=80, stretch=NO,anchor=CENTER)
 
        
         self.tree.place(y=120, relwidth=1, relheight=0.9, relx=0)
        
-    
+       
 def page():
     app =windows()
     app.mainloop()
