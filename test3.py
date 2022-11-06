@@ -86,7 +86,7 @@ class LoginForm(Frame):
         self.controller=controller
         self.hide_button = None       
         self.login_password=StringVar()
-    
+        self.show_pass=IntVar(value=0)
         def login(self):
 
             email = self.controller.shared_email['Login_email'].get()
@@ -108,8 +108,12 @@ class LoginForm(Frame):
                 tkinter.messagebox.showerror("Error",'Invalid username and password')
 
        
-
+        def show_pass(self):
             # ================= Login Frame =================
+            if (self.show_pass.get()==1):
+                self.pss_entry.config(show='*')
+            else:
+                self.pss_entry.config(show='')
 
         Frame.__init__(self, window)
         self.lgn_frame = Frame(self, bg='#FFFFFF', width='1780', height='1000')  # Color and the size of the frame
@@ -144,13 +148,19 @@ class LoginForm(Frame):
         self.pss_label.place(x=900, y=505)
         self.pss_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.email_icon)
-        self.pss_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
+        self.pss_icon_label = Label(self.lgn_frame,image=photo,bg='#FFFFFF')
         self.pss_icon_label.image = photo
         self.pss_icon_label.place(x=905, y=540)
         self.pss_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
-                               font=('yu gothic ui', 13, 'bold'), textvariable=self.login_password)
+                               font=('yu gothic ui', 13, 'bold'), textvariable=self.login_password,show='*')
         self.pss_entry.place(x=912, y=545, width=270)
-
+        
+        self.eye_icon = Image.open('images/eye.jpeg')
+        eye = ImageTk.PhotoImage(self.eye_icon)
+        self.show_pass_label = Checkbutton(self.lgn_frame,image = eye,onvalue=1,offvalue=0,variable=self.show_pass, bg='#FFFFFF')
+        self.show_pass_label.image = eye
+        self.show_pass_label.place(x=960,y=545)
+        self.show_pass_label.bind('<Button-1>',lambda e: show_pass(self))
         # ===========Forgot password=================
         self.forgot = Button(self.lgn_frame,text='Forgot Password?', font=('yu gothic ui', 16, 'bold'), width=20, bd=0,
                              bg='#FFFFFF', cursor='hand2', activebackground='#D1D0CE', fg='#728FCE',command=lambda :self.controller.show_frame(ValidEmail),)
