@@ -1,4 +1,6 @@
 from email import message
+from multiprocessing.forkserver import SIGNED_STRUCT
+from pickle import FRAME
 from tkinter.ttk import * 
 from tkinter import *
 import tkinter as tk
@@ -10,12 +12,19 @@ import tkinter.messagebox as mb
 import sqlite3
 from tkinter.messagebox import askyesno
 from tkcalendar import DateEntry
+import os
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
 import pandas as pd
 import numpy as np
+import re
+from forex_python.converter import CurrencyRates
+# Make a regular expression
+# for validating an Email
+#Regular Expression, is a sequence of characters that forms a search pattern. 
+regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 
 
@@ -31,15 +40,15 @@ class windows(Tk):
         # Adding a title to the window
         self.wm_title("Test Application")
         self.wm_title("Test Application")
-        self.width= self.winfo_screenwidth()
-        self.height= self.winfo_screenheight()
-        self.geometry("1530x1000")
-        
+        #self.width= self.winfo_screenwidth()
+        #self.height= self.winfo_screenheight()
+        self.geometry("1780x1000")
+        #self.resizable(0,0)
         #Creating the sharing variables across classes
-        self.shared_email={'signUp_email':StringVar(),'Login_email':StringVar()}
-        
+        self.shared_email={'signUp_email':StringVar(),'Login_email':StringVar(),'resetpass_email':StringVar()}
+
         # creating a frame and assigning it to container
-        container = Frame(self, height='1000', width='1700')
+        container = Frame(self, height='1000', width='1780')
         # specifying the region where the frame is packed in root
         container.place(x=0, y=0)
 
@@ -50,7 +59,7 @@ class windows(Tk):
         # We will now create a dictionary of frames
         self.frames = {}
         # we'll create the frames themselves later but let's add the components to the dictionary.
-        for F in (AccountPage,SecurityQuestion,ResetPass,LoginForm,SignupWin,SelectSQWin,Homepage,ResetWin,TransactionTable):
+        for F in (AccountPage,SecurityQuestion,ResetPass,LoginForm,SignupWin,AnswerSQWin,Homepage,ResetWin,TransactionTable,ValidEmail):
             frame = F(container, self)
 
             # the windows class acts as the root window for the frames.
@@ -71,23 +80,12 @@ class windows(Tk):
     def changePassword(self):
         mb.showinfo('Success','WELL DONE')
 
-   
-
-    
-
 
 class LoginForm(Frame):
     def __init__(self, window,controller):
         self.controller=controller
-        self.hide_button = None
-        Frame.__init__(self, window)
-        self.Login= Frame(self,bg="#FFFFFF",width='1000',height='1000')
-        self.Login.pack()
-          # Delete the restore button
-        #=================================
-        
+        self.hide_button = None       
         self.login_password=StringVar()
-
     
         def login(self):
 
@@ -104,19 +102,21 @@ class LoginForm(Frame):
     
             elif user_login_list:
                 mb.showinfo('Success',"Successfully login. ")
-                controller.show_frame(Homepage)   
                 
+                controller.show_frame(Homepage)   
             else:
                 tkinter.messagebox.showerror("Error",'Invalid username and password')
 
-      
+       
 
+            # ================= Login Frame =================
 
-        # ================= Login Frame =================
-        self.lgn_frame = Frame(self, bg='#FFFFFF', width='1166', height='718')  # Color and the size of the frame
+        Frame.__init__(self, window)
+        self.lgn_frame = Frame(self, bg='#FFFFFF', width='1780', height='1000')  # Color and the size of the frame
         self.lgn_frame.place(x=0, y=0)  # Placement of the frame
+        self.lgn_frame.pack()
 
-        self.frame1 = Frame(self, bg='#7FFFD4', width='583', height='718')
+        self.frame1 = Frame(self, bg='#7FFFD4', width='700', height='1000')
         self.frame1.place(x=0, y=0)
 
         # =============user icon===================
@@ -124,44 +124,44 @@ class LoginForm(Frame):
         photo = ImageTk.PhotoImage(self.username_icon)
         self.username_icon_label = Label(self.lgn_frame, image=photo, bg='#2B1B17')
         self.username_icon_label.image = photo
-        self.username_icon_label.place(x=756, y=25)
+        self.username_icon_label.place(x=950, y=175)
         # ================= Username =================
         self.email_label = Label(self.lgn_frame, text='Email', bg='#FFFFFF', font=('yu gothic ui', 13, 'bold'),
                                  fg='#000000')
-        self.email_label.place(x=656, y=275)
+        self.email_label.place(x=900, y=425)
         self.email_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.email_icon)
         self.email_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.email_icon_label.image = photo
-        self.email_icon_label.place(x=695, y=300)
+        self.email_icon_label.place(x=905, y=450)
         self.email_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                  font=('yu gothic ui', 13, 'bold'), textvariable=self.controller.shared_email['Login_email'])
-        self.email_entry.place(x=706, y=305, width=270)
+        self.email_entry.place(x=912, y=455, width=270)
 
         # ================= Password =================
         self.pss_label = Label(self.lgn_frame, text='Password', bg='#FFFFFF', font=('yu gothic ui', 13, 'bold'),
                                fg='#000000')
-        self.pss_label.place(x=656, y=355)
+        self.pss_label.place(x=900, y=505)
         self.pss_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.email_icon)
         self.pss_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.pss_icon_label.image = photo
-        self.pss_icon_label.place(x=695, y=390)
+        self.pss_icon_label.place(x=905, y=540)
         self.pss_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                font=('yu gothic ui', 13, 'bold'), textvariable=self.login_password)
-        self.pss_entry.place(x=706, y=395, width=270)
+        self.pss_entry.place(x=912, y=545, width=270)
 
         # ===========Forgot password=================
         self.forgot = Button(self.lgn_frame,text='Forgot Password?', font=('yu gothic ui', 16, 'bold'), width=20, bd=0,
-                             bg='#FFFFFF', cursor='hand2', activebackground='#D1D0CE', fg='#728FCE')
-        self.forgot.place(x=596, y=445)
+                             bg='#FFFFFF', cursor='hand2', activebackground='#D1D0CE', fg='#728FCE',command=lambda :self.controller.show_frame(ValidEmail),)
+        self.forgot.place(x=870, y=595)
 
         # ===========Login Button==========
         self.lgn_button = Image.open('images/3.jpg')
         photo = ImageTk.PhotoImage(self.lgn_button)
         self.lgn_button_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.lgn_button_label.image = photo
-        self.lgn_button_label.place(x=670, y=550)
+        self.lgn_button_label.place(x=850, y=700)
         self.login = Button(self.lgn_button_label, text='LOGIN', font=('yu gothic ui', 13, 'bold'),
                             width=10, bd=0, command=lambda :login(self),
                             bg='#FFFFFF', cursor='hand2', activebackground='#D1D0CE', fg='#000000')
@@ -171,7 +171,7 @@ class LoginForm(Frame):
         photo = ImageTk.PhotoImage(self.lgn_button)
         self.lgn_button_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.lgn_button_label.image = photo
-        self.lgn_button_label.place(x=870, y=550)
+        self.lgn_button_label.place(x=1100, y=700)
         self.login = Button(self.lgn_button_label, text='Sign Up', font=('yu gothic ui', 13, 'bold'),
                             width=10, bd=0, command=lambda: controller.show_frame(SignupWin),
                             bg='#FFFFFF', cursor='hand2', activebackground='#D1D0CE', fg='#000000')
@@ -201,12 +201,15 @@ class SignupWin(Frame):
                 mb.showerror("Sqlite Connector", "Enter Correct Details")
             elif self.Password.get() != self.Cpass.get() and self.Cpass.get() != self.Password.get():
                 mb.showerror("Please confirm your password")
+            elif not re.fullmatch(regex, self.email) :
+                mb.showerror('Error','Invalid email format')
             else:
 
                 cursor = con.cursor()
                 cursor.execute("INSERT INTO account (Email,Password) VALUES(?,?)",(self.email, self.Password.get(), ))
                 con.commit()
                 mb.showinfo('Success','Sign Up successfully')
+                # bring user to answer security question
                 controller.show_frame(SecurityQuestion)
          
         
@@ -231,75 +234,98 @@ class SignupWin(Frame):
 
 
         # ================= Sign up Frame =================
-        self.lgn_frame = Frame(self, bg='#FFFFFF', width='900', height='718')  # Color and the size of the frame
+        self.lgn_frame = Frame(self, bg='#FFFFFF', width='2200', height='1000')  # Color and the size of the frame
         self.lgn_frame.pack()  # Placement of the frame
         #============== Title ===========================
         self.password_label = Label(self.lgn_frame, text='Sign Up Here', bg='#FFFFFF', font=('yu gothic ui', 28, 'bold'),
                                     fg='#000000')
-        self.password_label.place(x=345, y=75)
+        self.password_label.place(x=745, y=75)
 
         #========== Email =================
         self.email_label = Label(self.lgn_frame, text='Email', bg='#FFFFFF', font=('yu gothic ui', 16, 'bold'),
                                  fg='#000000')
-        self.email_label.place(x=300, y=175)
+        self.email_label.place(x=700, y=175)
         self.email_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.email_icon)
         self.email_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.email_icon_label.image = photo
-        self.email_icon_label.place(x=300, y=215)
+        self.email_icon_label.place(x=700, y=215)
         self.email_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                  font=('yu gothic ui', 13, 'bold'), textvariable=self.controller.shared_email['signUp_email'])
-        self.email_entry.place(x=305, y=225, width=270)
+        self.email_entry.place(x=705, y=225, width=270)
         #============ Password ===========
         self.pass_label = Label(self.lgn_frame, text='Password', bg='#FFFFFF', font=('yu gothic ui', 16, 'bold'),
                                  fg='#000000')
-        self.pass_label.place(x=300, y=275)
+        self.pass_label.place(x=700, y=275)
         self.pass_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.email_icon)
         self.pass_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.pass_icon_label.image = photo
-        self.pass_icon_label.place(x=300, y=315)
+        self.pass_icon_label.place(x=700, y=315)
         self.pass_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                  font=('yu gothic ui', 13, 'bold'), textvariable=self.Password)
-        self.pass_entry.place(x=305, y=325, width=270)
+        self.pass_entry.place(x=705, y=325, width=270)
 
         #========== Confirm password ===============
         self.cpass_label = Label(self.lgn_frame, text='Confirm-Password', bg='#FFFFFF', font=('yu gothic ui', 16, 'bold'),
                                 fg='#000000')
-        self.cpass_label.place(x=300, y=375)
+        self.cpass_label.place(x=700, y=375)
         self.cpass_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.email_icon)
         self.cpass_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.cpass_icon_label.image = photo
-        self.cpass_icon_label.place(x=300, y=405)
+        self.cpass_icon_label.place(x=700, y=405)
         self.cpass_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                 font=('yu gothic ui', 13, 'bold'), textvariable=self.Cpass)
-        self.cpass_entry.place(x=305, y=415, width=270)
+        self.cpass_entry.place(x=705, y=415, width=270)
 
         #===========Sign up button=================
         self.sign_button = Image.open('images/12.jpg')
         photo = ImageTk.PhotoImage(self.sign_button)
         self.sign_button_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.sign_button_label.image = photo
-        self.sign_button_label.place(x=345, y=475)
+        self.sign_button_label.place(x=785, y=475)
         self.sign = Button(self.sign_button_label, text='Sign Up', font=('yu gothic ui', 10),
-                            width=10, bd=0,bg='#DFDFDF', cursor='hand2', activebackground='#D1D0CE',
+                            width=10, bd=0,bg='#DCDCDC', cursor='hand2', activebackground='#D1D0CE',
                            fg='#000000',command=lambda:addData(self))
-        self.sign.place(relx=0.1, rely=0.4)
+        self.sign.place(relx=0.15, rely=0.180)
         
-class SelectSQWin(Frame):
+class AnswerSQWin(Frame):
     def __init__(self, window,controller):
         self.controller=controller
         Frame.__init__(self, window)
         self.hide_button = None
-        
+
         # self.state('zoomed')  # Maximizing the page
-        
+        def valid_answer(self):
+            conn = sqlite3.connect('money.db')
+            cursor = conn.cursor()
+            if self.controller.shared_email['resetpass_email'].get():
+                cursor.execute('SELECT * FROM Security_Question WHERE Email =? AND Questions=? AND Answer= ?',(self.controller.shared_email['resetpass_email'].get(),self.SQuestion.get(),self.ans.get()))
+                data = cursor.fetchall()
+                print(data)
+                if data:
+                    mb.showinfo('Success','Answered Correctly')
+                    self.controller.show_frame(ResetPass)
+                else:
+                    mb.showerror('Error','Please try again')    
+            elif self.controller.shared_email['Login_email'].get():
+                cursor.execute('SELECT * FROM Security_Question WHERE Email =? AND Questions=? AND Answer= ?',(self.controller.shared_email['Login_email'].get(),self.SQuestion.get(),self.ans.get()))
+                data = cursor.fetchall()
+                print(data)
+                if data:
+                    mb.showinfo('Success','Answered Correctly')
+                    self.controller.show_frame(ResetPass)
+                else:
+                    mb.showerror('Error','Please try again')
+
         # =================================
-        SQuestion = StringVar()
+        self.SQuestion = StringVar()
         self.ans = StringVar()
+        #======================================
+       
         # ================= Sign up Frame =================
-        self.lgn_frame = Frame(self, bg='#FFFFFF', width='900', height='718')  # Color and the size of the frame
+        self.lgn_frame = Frame(self, bg='#FFFFFF', width='1780', height='1000')  # Color and the size of the frame
         self.lgn_frame.pack()  # Placement of the frame
         # ============== Title ===========================
         self.SQ_label = Label(self.lgn_frame, text='Select Security Question', bg='#FFFFFF',
@@ -311,8 +337,8 @@ class SelectSQWin(Frame):
                                  fg='#000000')
         self.SQ_label.place(x=200, y=175)
         self.cboSQ = ttk.Combobox(self.lgn_frame, font=('arial', 12, 'bold'), width=42, state='readonly',
-                                  textvariable=SQuestion)
-        self.cboSQ['values'] = ('1', '2', '3')
+                                  textvariable=self.SQuestion)
+        self.cboSQ['values'] = ('Where do you live?', 'What is your primary school?', 'What is your father name?')
         self.cboSQ.current(0)
         self.cboSQ.place(x=240,y=210)
 
@@ -332,9 +358,10 @@ class SelectSQWin(Frame):
         self.Next_button_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.Next_button_label.image = photo
         self.Next_button_label.place(x=345, y=525)
+        
         self.Next = Button(self.Next_button_label, text='Finish', font=('yu gothic ui', 16, 'bold'),
                            width=10, bd=0,
-                           bg='#DCDCDC', cursor='hand2', activebackground='#D1D0CE', fg='#000000')
+                           bg='#DCDCDC', cursor='hand2', activebackground='#D1D0CE', fg='#000000' ,command=lambda :valid_answer(self))
         self.Next.place(x=32, y=10)
 
 class ResetWin(Frame):
@@ -349,7 +376,7 @@ class ResetWin(Frame):
         self.Cpass = StringVar()
         self.Proceed = StringVar()
         # ================= Reset Frame =================
-        self.lgn_frame = Frame(self, bg='#FFFFFF', width='900', height='718')  # Color and the size of the frame
+        self.lgn_frame = Frame(self, bg='#FFFFFF', width='1900', height='1000')  # Color and the size of the frame
         self.lgn_frame.pack()  # Placement of the frame
         # ============== Title ===========================
         self.SQ_label = Label(self.lgn_frame, text='Reset Password', bg='#FFFFFF',
@@ -399,16 +426,18 @@ class Homepage(Frame):
         self.controller=controller
         self.hide_button = None
 
-    
+       
+
         def open_add(self):
             window = AddTransaction(self,controller)
             window.grab_set()
-
+        
         def reset(self):
             self.start_date_calender.delete(0,'end')
             self.end_date_calender.delete(0,'end')
 
         def show(self):
+
             self.start_date = self.start_date_calender.get_date()
             self.start_date_str = self.start_date.strftime("%Y-%m-%d")
             self.end_date = self.end_date_calender.get_date()
@@ -530,9 +559,27 @@ class Homepage(Frame):
                 transport.set(0)
             else: 
                 transport.set(transport_data[0])
-                             
 
-        #=====Int variable
+
+            #=============== Saving chart =============#
+            cursor.execute('''SELECT SUM(Amount)
+                                FROM Saving
+                                WHERE Email=? AND Date BETWEEN ? AND ? AND Category='Saving'
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            saving_data = cursor.fetchall()
+          
+            if len(saving_data) == 0:
+                saving.set(0)
+            else: 
+                saving.set(transport_data[0])
+
+
+        def log_out(self):
+            answer = askyesno(title='Confirmation',message='Are you sure want log out?')
+            if answer:
+                self.controller.show_frame(LoginForm)
+
+          #=====Int variable
         salary=IntVar()
         loan = IntVar()
         investment = IntVar()
@@ -541,12 +588,12 @@ class Homepage(Frame):
         food = IntVar()
         shopping = IntVar()
         transport =IntVar()
+        saving =IntVar()
 
 
         self.str_date=StringVar()
         self.end_date=StringVar()
-
-        
+       
         # ================= homepage Frame =================
         self.navbar_frame = Frame(self, bg='#ffffff', width='2500', height='65')
         self.navbar_frame.place(x=0, y=5)
@@ -570,6 +617,14 @@ class Homepage(Frame):
         self.tips_label = Label(self.navbar_frame, bg='#FFFFFF', text='Tips', font=("yu gothic ui", 18),
                                     fg='#11DD7B', cursor="hand2")
         self.tips_label.place(x=1390, y=11)
+
+        self.log_out_btn = Image.open('images/log_out.jpeg')
+        lgn_btn = ImageTk.PhotoImage(self.log_out_btn)
+        self.log_out_label = Label(self.navbar_frame, bg='#FFFFFF', image=lgn_btn ,cursor="hand2")
+        self.log_out_label.image = lgn_btn
+        self.log_out_label.place(x=100, y=11)
+        self.log_out_label.bind('<Button-1>',lambda e:log_out(self))
+
 
         # ================= Frame 1 =================
         self.a_frame = Frame(self, bg='#FFFFFF', width='450', height='650')  # Color and the size of the frame
@@ -788,11 +843,11 @@ class Homepage(Frame):
         self.agn_button_label = Label(self.c_frame, image=photo, bg='#FFFFFF')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=0, y=305)
-        self.acc = Button(self.agn_button_label, text='Home', font=('yu gothic ui', 13, 'bold'), width=15,
+        self.acc = Label(self.agn_button_label, text='Saving', font=('yu gothic ui', 13, 'bold'), width=15,
                           bd=0,
                           bg='#FFFFFF', cursor='hand2', activebackground='#DCDCDC', fg='#000000')
         self.acc.place(x=70, y=8)
-        self.ac = Button(self.agn_button_label, text='-100MYR', font=('yu gothic ui', 13, 'bold'), width=10,
+        self.ac = Label(self.agn_button_label, text='',textvariable=saving, font=('yu gothic ui', 13, 'bold'), width=10,
                          bd=0,
                          bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
         self.ac.place(x=330, y=8)
@@ -853,18 +908,17 @@ class AccountPage(Frame):
         self.email_strvar= StringVar()
         self.gender_strvar= StringVar()
         self.password_strvar= StringVar()
-        
 
         def display_profile(self):
-            
-                email = self.email_strvar
-                conn = sqlite3.connect('money.db')
-                cursor = conn.cursor()
-                cursor.execute('SELECT * FROM account WHERE Email LIKE ?',(self.controller.shared_email['Login_email'].get(), ))
-                data = cursor.fetchall()
-                print(data)
-                email.set(data[0][0]),self.password_strvar.set(data[0][1]),self.name_strvar.set(data[0][2]),self.gender_strvar.set(data[0][3])
         
+            email = self.email_strvar
+            conn = sqlite3.connect('money.db')
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM account WHERE Email LIKE ?',(self.controller.shared_email['Login_email'].get(), ))
+            data = cursor.fetchall()
+        
+            email.get(data[0]),self.password_strvar.get(data[1]),self.name_strvar.get(data[2]),self.gender_strvar.get(data[3])
+
         #======== Define Frame=======
        
         self.navbar_frame= Frame(self,bg='#ffffff',width=self.width,height='50')
@@ -889,7 +943,6 @@ class AccountPage(Frame):
     
         #===== Account card=====
         #=====Name Entry======
-        Button(self.accountcard_frame,text='show',width=10,command= lambda:display_profile(self)).place(x=60,y=60)
         self.label_img =Image.open('images/27.jpg')
         img = ImageTk.PhotoImage(self.label_img)
         self.name_label =Label(self.accountcard_frame,text='Name',font=labelfont,bg='#ffffff')
@@ -945,7 +998,52 @@ class AccountPage(Frame):
         self.reset_label = Label(self.accountcard_frame,text='Reset Password',font=btnfont,bg='#D9D9D9',cursor='hand2')
         self.reset_label.place(relx=0.63,rely=0.81)
         self.reset_label.bind("<Button-1>",lambda e:controller.show_frame(SecurityQuestion))
+
+class ValidEmail(Frame):
+    def __init__(self, window,controller):
+        Frame.__init__(self, window)
+        self.controller=controller
         
+        def valid_email(self):
+            conn = sqlite3.connect('money.db')  
+            cursor = conn.cursor()
+            cursor.execute('SELECT Email  FROM account WHERE Email=?',(self.controller.shared_email['resetpass_email'].get(),))
+            email_data = cursor.fetchall()
+            print(email_data)
+
+            if  email_data:
+                self.controller.show_frame(AnswerSQWin)
+            else:
+                mb.showerror('Error','Invalid email')
+                
+    
+        self.Valid =Frame(self,bg='#FFFFFF',width='2300',height='1000')
+        self.Valid.pack(pady=0,padx=0)
+
+        self.head_label = Label(self.Valid,text='Enter your email',font=headfont,bg='#FFFFFF')
+        self.head_label.place(relx=0.28,rely=0.2)
+
+        self.email_label = Label(self.Valid,text='Email',bg='#FFFFFF',font=labelfont)
+        self.email_label.place(relx=0.32,rely=0.3)
+        self.email_box = Image.open('images/32.jpg')
+        email_box_img = ImageTk.PhotoImage(self.email_box)
+        self.email_box = Label(self.Valid,image=email_box_img,bg='#FFFFFF')
+        self.email_box.image=email_box_img
+        self.email_box.place(relx=0.32,rely=0.35)
+
+        self.email_entry = Entry(self.Valid,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT, textvariable=self.controller.shared_email['resetpass_email'])
+        self.email_entry.place(relx=0.33,rely=0.36)
+
+        
+        self.nextbtn_img =Image.open('images/31.jpg')
+        nextbtn = ImageTk.PhotoImage(self.nextbtn_img)
+        self.nextbtn = Label(self.Valid,image=nextbtn,bg='#FFFFFF')
+        self.nextbtn.image = nextbtn
+        self.nextbtn.place(relx=0.35,rely=0.52)
+        self.next_label = Label(self.Valid,text='Next',bg='#D9D9D9',cursor='hand2',font=btnfont)
+        self.next_label.place(relx=0.37,rely=0.53)
+        self.next_label.bind('<Button-1>',lambda e:valid_email(self))
+
 class SecurityQuestion(Frame):
     def __init__(self, window,controller):
         Frame.__init__(self, window)
@@ -966,10 +1064,8 @@ class SecurityQuestion(Frame):
                 conn.commit()
                 mb.showinfo('Success','Commit Success!')
                 controller.show_frame(LoginForm)
-
-
-
-        self.Question =Frame(self,bg='#FFFFFF',width='900',height='800')
+                
+        self.Question =Frame(self,bg='#FFFFFF',width='1780',height='1000')
         self.Question.pack(pady=50)
         
         
@@ -978,62 +1074,62 @@ class SecurityQuestion(Frame):
         self.third = StringVar()
         self.Next = StringVar()
         # ================= Sign up Frame =================
-        self.lgn_frame = Frame(self, bg='#FFFFFF', width='900', height='718')  # Color and the size of the frame
+        self.lgn_frame = Frame(self, bg='#FFFFFF', width='1780', height='1000')  # Color and the size of the frame
         self.lgn_frame.place(x=0, y=0)  # Placement of the frame
         # ============== Title ===========================
         self.SQ_label = Label(self.lgn_frame, text='Set Security Question', bg='#FFFFFF',
                                     font=('yu gothic ui', 32, 'bold'),
                                     fg='#000000')
-        self.SQ_label.place(x=255, y=55)
+        self.SQ_label.place(x=655, y=55)
         # ========== 1st Question =================
         self.first_label = Label(self.lgn_frame, text='Where do you live?', bg='#FFFFFF', font=('yu gothic ui', 16, 'bold'),
                                  fg='#000000')
-        self.first_label.place(x=300, y=175)
+        self.first_label.place(x=700, y=175)
         self.first_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.first_icon)
         self.first_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.first_icon_label.image = photo
-        self.first_icon_label.place(x=300, y=215)
+        self.first_icon_label.place(x=700, y=215)
         self.first_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                  font=('yu gothic ui', 13, 'bold'), textvariable=self.first)
-        self.first_entry.place(x=305, y=225, width=270)
+        self.first_entry.place(x=705, y=225, width=270)
 
         # ========== 2nd Question =================
         self.second_label = Label(self.lgn_frame, text='What is your primary school?', bg='#FFFFFF', font=('yu gothic ui', 16, 'bold'),
                                  fg='#000000')
-        self.second_label.place(x=300, y=275)
+        self.second_label.place(x=700, y=275)
         self.second_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.first_icon)
         self.second_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.second_icon_label.image = photo
-        self.second_icon_label.place(x=300, y=315)
+        self.second_icon_label.place(x=700, y=315)
         self.second_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                  font=('yu gothic ui', 13, 'bold'), textvariable=self.second)
-        self.second_entry.place(x=305, y=325, width=270)
+        self.second_entry.place(x=705, y=325, width=270)
 
         # ========== 3rd Question =================
         self.third_label = Label(self.lgn_frame, text='What is your father name?', bg='#FFFFFF', font=('yu gothic ui', 16, 'bold'),
                                   fg='#000000')
-        self.third_label.place(x=300, y=375)
+        self.third_label.place(x=700, y=375)
         self.third_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.first_icon)
         self.third_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.third_icon_label.image = photo
-        self.third_icon_label.place(x=300, y=415)
+        self.third_icon_label.place(x=700, y=415)
         self.third_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                   font=('yu gothic ui', 13, 'bold'), textvariable=self.third)
-        self.third_entry.place(x=305, y=425, width=270)
+        self.third_entry.place(x=705, y=425, width=270)
 
         # ===========Next button=================
         self.Next_button = Image.open('images/12.jpg')
         photo = ImageTk.PhotoImage(self.Next_button)
         self.Next_button_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.Next_button_label.image = photo
-        self.Next_button_label.place(x=345, y=525)
-        self.Next = Button(self.Next_button_label, text='Finish', font=('yu gothic ui', 16, 'bold'),
-                           width=10, bd=0,
+        self.Next_button_label.place(x=785, y=525)
+        self.Next = Button(self.Next_button_label, text='Finish', font=('yu gothic ui', 14, 'bold'),
+                           width=5, bd=0,
                            bg='#DCDCDC', cursor='hand2', activebackground='#D1D0CE', fg='#000000',command= lambda :add_question(self))
-        self.Next.place(x=32, y=10)
+        self.Next.place(x=24, y=5)
 
 class ResetPass(Frame):
     def __init__(self,ResetWindow,controller) :
@@ -1044,38 +1140,43 @@ class ResetPass(Frame):
             window = AddTransaction(self)
             window.grab_set()
 
-        self.Reset =Frame(self,bg='#FFFFFF',width='900',height='800')
-        self.Reset.pack(pady=40)
+        def change(self):
+            conn = sqlite3.connect('money.db')
+            cursor = conn.cursor()
+            cursor.execute('UPDATE account SET Password =? WHERE Email=?')
+
+        self.Reset =Frame(self,bg='#FFFFFF',width='2300',height='1000')
+        self.Reset.pack(pady=0,padx=0)
 
         self.head_label = Label(self.Reset,text='Reset Password',font=headfont,bg='#FFFFFF')
-        self.head_label.place(relx=0.42,rely=0.2)
+        self.head_label.place(relx=0.28,rely=0.2)
 
         self.pass_label = Label(self.Reset,text='Password',bg='#FFFFFF',font=labelfont)
-        self.pass_label.place(relx=0.35,rely=0.3)
+        self.pass_label.place(relx=0.32,rely=0.3)
         self.pass_box = Image.open('images/32.jpg')
         pass_box_img = ImageTk.PhotoImage(self.pass_box)
         self.pass_box = Label(self.Reset,image=pass_box_img,bg='#FFFFFF')
         self.pass_box.image=pass_box_img
-        self.pass_box.place(relx=0.35,rely=0.35)
+        self.pass_box.place(relx=0.32,rely=0.35)
         self.pass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT)
-        self.pass_entry.place(relx=0.36,rely=0.36)
+        self.pass_entry.place(relx=0.33,rely=0.36)
 
         self.repass_label =Label(self.Reset,text='Confirm Password',bg='#FFFFFF',font=labelfont)
-        self.repass_label.place(relx=0.35,rely=0.4)
+        self.repass_label.place(relx=0.32,rely=0.4)
         self.repass_box = Image.open('images/32.jpg')
         self.repass_box = Label(self.Reset,image=pass_box_img,bg='#FFFFFF')
         self.repass_box.image=pass_box_img
-        self.repass_box.place(relx=0.35,rely=0.45)
+        self.repass_box.place(relx=0.32,rely=0.45)
         self.repass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT)
-        self.repass_entry.place(relx=0.36,rely=0.46)
+        self.repass_entry.place(relx=0.33,rely=0.46)
 
         self.resetbtn_img =Image.open('images/31.jpg')
         resetbtn = ImageTk.PhotoImage(self.resetbtn_img)
         self.resetbtn = Label(self.Reset,image=resetbtn,bg='#FFFFFF')
         self.resetbtn.image = resetbtn
-        self.resetbtn.place(relx=0.43,rely=0.58)
+        self.resetbtn.place(relx=0.35,rely=0.52)
         self.reset_label = Label(self.Reset,text='Reset',bg='#D9D9D9',cursor='hand2',font=btnfont)
-        self.reset_label.place(relx=0.48,rely=0.59)
+        self.reset_label.place(relx=0.37,rely=0.53)
         self.reset_label.bind('<Button-1>',lambda e: controller.show_frame(SecurityQuestion))
 
 class AddTransaction(Toplevel):
@@ -1099,21 +1200,28 @@ class AddTransaction(Toplevel):
 
             conn = sqlite3.connect('money.db')
             cursor = conn.cursor()
-            
+            cr = CurrencyRates()
+
             if not self.category or not self.amount or not self.currency :
                 mb.showerror('Error','Please fill in the blank!')
             elif self.amount <= 0:
                 mb.showerror('Error','The amount cannot less than zero!')
             elif self.category =='Salary' or self.category == 'Loan' or self.category == 'Investment':
-                cursor.execute('INSERT INTO Income(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,self.amount,self.currency))
+                converted_amount = cr.convert(self.currency,'MYR',self.amount)
+                decimal_amount = round(converted_amount,2)
+                cursor.execute('INSERT INTO Income(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,decimal_amount,'MYR'))
                 conn.commit()
                 mb.showinfo('Success','Commit success')
             elif self.category =='Food&Drink' or self.category == 'Travel' or self.category == 'Cars' or self.category == 'Shopping' or self.category == 'Home':
-                cursor.execute('INSERT INTO Expenses(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,self.amount,self.currency))
+                converted_amount = cr.convert(self.currency,'MYR',self.amount)
+                decimal_amount = round(converted_amount,2)
+                cursor.execute('INSERT INTO Expenses(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,decimal_amount,'MYR'))
                 conn.commit()
                 mb.showinfo('Success','Commit success') 
             elif self.category =='Saving' :
-                cursor.execute('INSERT INTO Saving(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,self.amount,self.currency))
+                converted_amount = cr.convert(self.currency,'MYR',self.amount)
+                decimal_amount = round(converted_amount,2)
+                cursor.execute('INSERT INTO Saving(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,decimal_amount,'MYR'))
                 conn.commit()
                 mb.showinfo('Success','Commit success')
             else:
@@ -1178,15 +1286,15 @@ class TransactionTable(Frame):
             self.tree.delete(*self.tree.get_children())
             conn = sqlite3.connect('money.db')
             cursor =conn.cursor()
-            cursor.execute('SELECT Category,Date,Note,Amount,Currency FROM Transaction_record WHERE Email =?',(email,))
+            cursor.execute('SELECT * FROM Transaction_record WHERE Email =?',(email,))
             data =cursor.fetchall()
             for record in data:
                 self.tree.insert('',END,values=record)
         
-        self.table_frame =Frame(self,bg='#FFFFFF',width='1520',height='800')
-        self.table_frame.pack()
+        self.table_frame =Frame(self,bg='#FFFFFF',width='1760',height='800')
+        self.table_frame.place(x=0,y=110)
 
-        self.navbar_frame = Frame(self, bg='#ffffff', width='1500', height='65')
+        self.navbar_frame = Frame(self, bg='#ffffff', width='1780', height='65')
         self.navbar_frame.place(x=0, y=5)
 
         # ======Nav bar======
