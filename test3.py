@@ -1320,10 +1320,13 @@ class TransactionTable(Frame):
                     selection = values["values"]
                     self.tree.delete(current_item)
                     cursor.execute('DELETE FROM Income WHERE Transaction_ID=%s' % selection[0])
+                    cursor.execute('DELETE FROM Expenses WHERE Transaction_ID=%s' % selection[0])
+                    cursor.execute('DELETE FROM Saving WHERE Transaction_ID=%s' % selection[0])
                     conn.commit()
                     mb.showinfo('Done', 'The record you wanted deleted was successfully deleted.')
                     display_record(self)
-                    
+        
+                
         
         self.table_frame =Frame(self,bg='#FFFFFF',width='1760',height='800')
         self.table_frame.place(x=0,y=110)
