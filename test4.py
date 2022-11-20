@@ -1136,12 +1136,10 @@ class ResetPass(Frame):
     def __init__(self,ResetWindow,controller) :
         Frame.__init__(self, ResetWindow)
         self.controller=controller
-        #open Top level window
-        def open(self):
-            window = AddTransaction(self)
-            window.grab_set()
+        self.password = StringVar()
+        self.confirmpass = StringVar()
 
-        def change(self):
+        def reset_pass(self):
             conn = sqlite3.connect('money.db')
             cursor = conn.cursor()
             cursor.execute('UPDATE account SET Password =? WHERE Email=?')
@@ -1159,7 +1157,7 @@ class ResetPass(Frame):
         self.pass_box = Label(self.Reset,image=pass_box_img,bg='#FFFFFF')
         self.pass_box.image=pass_box_img
         self.pass_box.place(relx=0.32,rely=0.35)
-        self.pass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT)
+        self.pass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.password)
         self.pass_entry.place(relx=0.33,rely=0.36)
 
         self.repass_label =Label(self.Reset,text='Confirm Password',bg='#FFFFFF',font=labelfont)
@@ -1168,7 +1166,7 @@ class ResetPass(Frame):
         self.repass_box = Label(self.Reset,image=pass_box_img,bg='#FFFFFF')
         self.repass_box.image=pass_box_img
         self.repass_box.place(relx=0.32,rely=0.45)
-        self.repass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT)
+        self.repass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.confirmpass)
         self.repass_entry.place(relx=0.33,rely=0.46)
 
         self.resetbtn_img =Image.open('images/31.jpg')
