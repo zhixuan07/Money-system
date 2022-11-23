@@ -31,7 +31,7 @@ regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 
 labelfont=("yu gothic ui",14)
-entryfont=("yu gothic ui",10)
+entryfont=("yu gothic ui",14)
 btnfont=('yu gothic ui',12)
 headfont=('yu gothic ui',14,'bold')
 
@@ -69,7 +69,7 @@ class windows(Tk):
             frame.grid(row=0, column=0, sticky="nsew")
 
         # Using a method to switch frames
-        self.show_frame(Tip)
+        self.show_frame(LoginForm)
 
     def show_frame(self, cont):
             frame = self.frames[cont]
@@ -88,6 +88,7 @@ class LoginForm(Frame):
         self.hide_button = None       
         self.login_password=StringVar()
         self.show_pass=IntVar(value=0)
+
         def login(self):
 
             email = self.controller.shared_email['Login_email'].get()
@@ -133,43 +134,43 @@ class LoginForm(Frame):
         photo = ImageTk.PhotoImage(self.username_icon)
         self.username_icon_label = Label(self.lgn_frame, image=photo, bg='#2B1B17')
         self.username_icon_label.image = photo
-        self.username_icon_label.place(x=950, y=175)
+        self.username_icon_label.place(x=750, y=175)
         # ================= Username =================
         self.email_label = Label(self.lgn_frame, text='Email', bg='#FFFFFF', font=('yu gothic ui', 13, 'bold'),
                                  fg='#000000')
-        self.email_label.place(x=900, y=425)
+        self.email_label.place(x=700, y=425)
         self.email_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.email_icon)
         self.email_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.email_icon_label.image = photo
-        self.email_icon_label.place(x=905, y=450)
+        self.email_icon_label.place(x=705, y=450)
         self.email_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                  font=('yu gothic ui', 13, 'bold'), textvariable=self.controller.shared_email['Login_email'])
-        self.email_entry.place(x=912, y=457, width=270)
+        self.email_entry.place(x=712, y=457, width=270)
 
         # ================= Password =================
         self.pss_label = Label(self.lgn_frame, text='Password', bg='#FFFFFF', font=('yu gothic ui', 13, 'bold'),
                                fg='#000000')
-        self.pss_label.place(x=900, y=505)
+        self.pss_label.place(x=700, y=505)
         self.pss_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.email_icon)
         self.pss_icon_label = Label(self.lgn_frame,image=photo,bg='#FFFFFF')
         self.pss_icon_label.image = photo
-        self.pss_icon_label.place(x=905, y=540)
+        self.pss_icon_label.place(x=705, y=540)
         self.pss_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                font=('yu gothic ui', 13, 'bold'), textvariable=self.login_password,show='*')
-        self.pss_entry.place(x=912, y=547, width=270)
+        self.pss_entry.place(x=712, y=547, width=270)
         
         self.eye_icon = Image.open('images/eye.jpeg')
         eye = ImageTk.PhotoImage(self.eye_icon)
         self.show_pass_label = Checkbutton(self.lgn_frame,image = eye,onvalue=1,offvalue=0,variable=self.show_pass, bg='#FFFFFF')
         self.show_pass_label.image = eye
-        self.show_pass_label.place(x=1200,y=545)
+        self.show_pass_label.place(x=1000,y=545)
         self.show_pass_label.bind('<Button-1>',lambda e: show_pass(self))
         # ===========Forgot password=================
         self.forgot = customtkinter.CTkButton(self.lgn_frame,text='Forgot Password?', width=100,
                     fg_color='#FFFFFF', hover_color="#D9D9D9" ,cursor='hand2',command=lambda :self.controller.show_frame(ValidEmail),)
-        self.forgot.place(x=900, y=595)
+        self.forgot.place(x=700, y=595)
 
         # ===========Login Button==========
         
@@ -177,13 +178,13 @@ class LoginForm(Frame):
         self.login = customtkinter.CTkButton(self.lgn_frame, text='Login',text_font=('yu gothic ui',13),
                             width=100,height=40, border_width=1, command=lambda :login(self),
                             fg_color='#FFFFFF', hover_color='#F2F2F2' ,cursor='hand2')
-        self.login.place(relx=0.52, rely=0.7)
+        self.login.place(relx=0.4, rely=0.7)
         # ==========Sign Up===================
         
         self.login = customtkinter.CTkButton(self.lgn_frame, text='Sign Up', text_font=('yu gothic ui', 13),
                             width=100,height=40, border_width=1, command=lambda: controller.show_frame(SignupWin),
                             fg_color='#FFFFFF',hover_color='#F2F2F2', cursor='hand2' )
-        self.login.place(relx=0.64,rely=0.7)
+        self.login.place(relx=0.51,rely=0.7)
     
 class SignupWin(Frame):
     
@@ -286,10 +287,14 @@ class SignupWin(Frame):
 
         #===========Sign up button=================
        
-       
         self.sign = customtkinter.CTkButton(self.lgn_frame, text='Sign Up', text_font=('yu gothic ui',10),
-                           border_width=1, width=150,height=30, fg_color='#FFFFFF',hover_color='#F2F2F2',command=lambda:addData(self))
-        self.sign.place(x=770, y=625)
+                           border_width=1, width=100,height=30, fg_color='#FFFFFF',hover_color='#F2F2F2',command=lambda:addData(self))
+        self.sign.place(x=850, y=625)
+
+        #===============Back button ================
+        self.back = customtkinter.CTkButton(self.lgn_frame, text='Back', text_font=('yu gothic ui',10),
+                           border_width=1, width=100,height=30, fg_color='#FFFFFF',hover_color='#F2F2F2',command=lambda:self.controller.show_frame(LoginForm))
+        self.back.place(x=740, y=625)
         
 class AnswerSQWin(Frame):
     def __init__(self, window,controller):
@@ -326,41 +331,38 @@ class AnswerSQWin(Frame):
         #======================================
        
         # ================= Sign up Frame =================
-        self.lgn_frame = Frame(self, bg='#FFFFFF', width='2300', height='1000')  # Color and the size of the frame
-        self.lgn_frame.pack()  # Placement of the frame
+        self.lgn_frame = Frame(self, bg='#FFFFFF', width='1500', height='1000')  # Color and the size of the frame
+        self.lgn_frame.place(x=0,y=0)  # Placement of the frame
         # ============== Title ===========================
         self.SQ_label = Label(self.lgn_frame, text='Select Security Question', bg='#FFFFFF',
                                     font=('yu gothic ui', 32, 'bold'),
                                     fg='#000000')
-        self.SQ_label.place(x=715, y=55)
+        self.SQ_label.place(x=615, y=55)
         # ========== Select Question =================
         self.SQ_label = Label(self.lgn_frame, text='Choose here', bg='#FFFFFF', font=('yu gothic ui', 16, 'bold'),
                                  fg='#000000')
-        self.SQ_label.place(x=700, y=175)
+        self.SQ_label.place(x=650, y=175)
         self.cboSQ = ttk.Combobox(self.lgn_frame, font=('arial', 12, 'bold'), width=42, state='readonly',
                                   textvariable=self.SQuestion)
         self.cboSQ['values'] = ('Where do you live?', 'What is your primary school?', 'What is your father name?')
         self.cboSQ.current(0)
-        self.cboSQ.place(x=740,y=210)
+        self.cboSQ.place(x=650,y=210)
 
         #========== Answer ===========
-        self.ans_icon = Image.open('images/14.jpg')
+        self.ans_icon = Image.open('images/UsernameBar.jpg')
         photo = ImageTk.PhotoImage(self.ans_icon)
         self.ans_icon_label = Label(self.lgn_frame, image=photo, bg='#FFFFFF')
         self.ans_icon_label.image = photo
-        self.ans_icon_label.place(x=770, y=300)
+        self.ans_icon_label.place(x=650, y=300)
         self.ans_entry = Entry(self.lgn_frame, highlightthickness=0, relief=FLAT, bg='#FFFFFF', fg='#000000',
                                     font=('yu gothic ui', 13, 'bold'), textvariable=self.ans)
-        self.ans_entry.place(x=775, y=325, width=430)
+        self.ans_entry.place(x=654, y=310, width=200)
 
         # ===========Next button=================
-        
-       
-        
         self.Next = customtkinter.CTkButton(self.lgn_frame, text='Next', text_font=('yu gothic ui', 14),
                            width=100,height=40, border_width=1,
                            fg_color='#DCDCDC',hover_color='#F2F2F2', cursor='hand2' ,command=lambda :valid_answer(self))
-        self.Next.place(relx=0.45,rely=0.5)
+        self.Next.place(relx=0.5,rely=0.45)
 
 class ResetWin(Frame):
     def __init__(self, window,controller):
@@ -530,11 +532,6 @@ class Homepage(Frame):
             else: 
                 shopping.set(shopping_data[0])  
             #====================================#
-            cursor.execute('''SELECT Category , SUM(Amount)
-                            FROM Expenses
-                            WHERE Email=? AND Date BETWEEN ? AND ?
-                            GROUP BY Category
-                            ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
 
             cursor.execute('''SELECT SUM(Amount)
                                 FROM Expenses
@@ -558,6 +555,27 @@ class Homepage(Frame):
             else: 
                 transport.set(transport_data[0])
 
+            #====================================#
+            cursor.execute('''SELECT Category ,SUM(Amount)
+                                FROM Expenses
+                                WHERE Email=? AND Date BETWEEN ? AND ?
+                                GROUP BY Category 
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            
+            expenses_graph_data=cursor.fetchall()   
+           
+            df2 = pd.DataFrame(expenses_graph_data,columns=['Category','Amount'])
+            
+       
+            fig = Figure(figsize=(3,3)) # create a figure object
+            ax = fig.add_subplot(111) # add an Axes to the figure
+
+            ax.pie(df2['Amount'], radius=1, labels=df2['Category'], colors=['navy','royalblue','firebrick','blueviolet','hotpink'],wedgeprops={'width':0.3}, 
+                startangle=90,)
+            
+
+            chart2 = FigureCanvasTkAgg(fig,self.b_frame)
+            chart2.get_tk_widget().place(relx=0.17,rely=0.01)
 
             #=============== Saving chart =============#
             cursor.execute('''SELECT SUM(Amount)
@@ -569,7 +587,31 @@ class Homepage(Frame):
             if len(saving_data) == 0:
                 saving.set(0)
             else: 
-                saving.set(transport_data[0])
+                saving.set(saving_data[0])
+            
+            #====================================#
+            cursor.execute('''SELECT Category ,SUM(Amount)
+                                FROM Saving
+                                WHERE Email=? AND Date BETWEEN ? AND ?
+                                GROUP BY Category 
+                                 ''',(self.controller.shared_email['Login_email'].get(),self.start_date_str,self.end_date_str,))
+            
+            saving_graph_data=cursor.fetchall()   
+           
+            df3 = pd.DataFrame(saving_graph_data,columns=['Category','Amount'])
+            
+       
+            fig = Figure(figsize=(3,3)) # create a figure object
+            ax = fig.add_subplot(111) # add an Axes to the figure
+
+            ax.pie(df3['Amount'], radius=1, labels=df3['Category'], colors=['darkcyan'],wedgeprops={'width':0.3}, 
+                startangle=90,)
+            
+
+            chart3 = FigureCanvasTkAgg(fig,self.c_frame)
+            chart3.get_tk_widget().place(relx=0.17,rely=0.01)
+            
+             
 
 
         def log_out(self):
@@ -655,7 +697,7 @@ class Homepage(Frame):
         
         
         self.add = customtkinter.CTkButton(self, text='Add Transaction', fg_color='#11DD7B',
-                        hover_color='#FFFFFF', cursor='hand2', relief=FLAT,command= lambda:open_add(self),width=150,height=50)
+                        hover_color='#FFFFFF', cursor='hand2', relief=FLAT,command= lambda:open_add(self),width=150,height=35)
         self.add.place(x=100, y=125)
 
         #===============================Card Title Label =====================
@@ -854,15 +896,6 @@ class Homepage(Frame):
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=20, y=320)
 
-        
-
-        
-
-        self.agn_button = Image.open('images/4.jpg')
-        photo = ImageTk.PhotoImage(self.agn_button)
-        self.agn_button_label = Label(self.c_frame, image=photo, bg='#000000')
-        self.agn_button_label.image = photo
-        self.agn_button_label.place(x=20, y=431)
 
 class AccountPage(Frame):
     def __init__(self, window, controller):
@@ -872,7 +905,7 @@ class AccountPage(Frame):
         
         self.name_strvar= StringVar()
         self.email_strvar= StringVar()
-        self.gender_strvar= StringVar()
+        
         self.password_strvar= StringVar()
 
         
@@ -886,6 +919,14 @@ class AccountPage(Frame):
                 
                 email.set(data [0][0]),self.name_strvar.set(data[0][1])
         
+        def save_change(self):
+            self.name = self.name_strvar.get()
+            self.email = self.email_strvar.get()
+            if self.name !=0 and email !=0:
+                cursor.execute('UPDATE account set  Name=? WHERE Email=?',(self.name,self.controller.shared_email['Login_email'].get()))
+                conn.commit()
+                mb.showinfo('Success','The profile is update')
+
         def log_out(self):
             answer = askyesno(title='Confirmation',message='Are you sure want log out?')
             if answer:
@@ -948,20 +989,21 @@ class AccountPage(Frame):
         self.email_entry_label.place(relx=0.5,rely=0.33)
         self.email_entry = Entry(self.accountcard_frame,width=19,bg='#D9D9D9',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.email_strvar)
         self.email_entry.place(relx=0.51,rely=0.345)
+        self.email_entry.config(state='disabled')
 
       
         #======Button=======
         
         self.save_label = customtkinter.CTkButton(self.accountcard_frame,text='Save',fg_color='#D9D9D9',hover_color='#FFFFFF'
-                        ,width=100,height=40,text_font=btnfont,cursor='hand2',border_width=1)
+                        ,width=100,height=40,text_font=btnfont,cursor='hand2',border_width=1,command=lambda:save_change(self))
         self.save_label.place(relx=0.25,rely=0.81)
-        self.save_label.bind('<Button-1>',lambda e:controller.saveChange())
+        
 
         
         self.reset_label = customtkinter.CTkButton(self.accountcard_frame,text='Reset Password',text_font=btnfont,fg_color='#D9D9D9',hover_color='#FFFFFF',
-                                width=100,height=40,cursor='hand2',border_width=1)
+                                width=100,height=40,cursor='hand2',border_width=1,command=lambda:controller.show_frame(ValidEmail))
         self.reset_label.place(relx=0.63,rely=0.81)
-        self.reset_label.bind("<Button-1>",lambda e:controller.show_frame(SecurityQuestion))
+        
 
 class ValidEmail(Frame):
     def __init__(self, window,controller):
@@ -985,28 +1027,24 @@ class ValidEmail(Frame):
         self.Valid.pack(pady=0,padx=0)
 
         self.head_label = Label(self.Valid,text='Enter your email',font=headfont,bg='#FFFFFF')
-        self.head_label.place(relx=0.28,rely=0.2)
+        self.head_label.place(relx=0.29,rely=0.2)
 
         self.email_label = Label(self.Valid,text='Email',bg='#FFFFFF',font=labelfont)
-        self.email_label.place(relx=0.32,rely=0.3)
+        self.email_label.place(relx=0.29,rely=0.3)
         self.email_box = Image.open('images/32.jpg')
         email_box_img = ImageTk.PhotoImage(self.email_box)
         self.email_box = Label(self.Valid,image=email_box_img,bg='#FFFFFF')
         self.email_box.image=email_box_img
-        self.email_box.place(relx=0.32,rely=0.35)
+        self.email_box.place(relx=0.29,rely=0.35)
 
         self.email_entry = Entry(self.Valid,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT, textvariable=self.controller.shared_email['resetpass_email'])
-        self.email_entry.place(relx=0.33,rely=0.36)
+        self.email_entry.place(relx=0.30,rely=0.36)
 
         
-        self.nextbtn_img =Image.open('images/31.jpg')
-        nextbtn = ImageTk.PhotoImage(self.nextbtn_img)
-        self.nextbtn = Label(self.Valid,image=nextbtn,bg='#FFFFFF')
-        self.nextbtn.image = nextbtn
-        self.nextbtn.place(relx=0.35,rely=0.52)
-        self.next_label = Label(self.Valid,text='Next',bg='#D9D9D9',cursor='hand2',font=btnfont)
-        self.next_label.place(relx=0.37,rely=0.53)
-        self.next_label.bind('<Button-1>',lambda e:valid_email(self))
+        
+        self.next_label = customtkinter.CTkButton(self.Valid,text='Next',fg_color='#FFFFFF',hover_color='#F2F2F2',cursor='hand2',border_width=1,width=100,height=40,command=lambda:valid_email(self))
+        self.next_label.place(relx=0.33,rely=0.43)
+        
 
 class SecurityQuestion(Frame):
     def __init__(self, window,controller):
@@ -1118,38 +1156,42 @@ class ResetPass(Frame):
         self.head_label.place(relx=0.28,rely=0.2)
 
         self.pass_label = Label(self.Reset,text='Password',bg='#FFFFFF',font=labelfont)
-        self.pass_label.place(relx=0.32,rely=0.3)
+        self.pass_label.place(relx=0.28,rely=0.3)
         self.pass_box = Image.open('images/32.jpg')
         pass_box_img = ImageTk.PhotoImage(self.pass_box)
         self.pass_box = Label(self.Reset,image=pass_box_img,bg='#FFFFFF')
         self.pass_box.image=pass_box_img
-        self.pass_box.place(relx=0.32,rely=0.35)
+        self.pass_box.place(relx=0.28,rely=0.35)
         self.pass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.password)
-        self.pass_entry.place(relx=0.33,rely=0.36)
+        self.pass_entry.place(relx=0.29,rely=0.36)
 
         self.repass_label =Label(self.Reset,text='Confirm Password',bg='#FFFFFF',font=labelfont)
-        self.repass_label.place(relx=0.32,rely=0.4)
+        self.repass_label.place(relx=0.28,rely=0.4)
         self.repass_box = Image.open('images/32.jpg')
         self.repass_box = Label(self.Reset,image=pass_box_img,bg='#FFFFFF')
         self.repass_box.image=pass_box_img
-        self.repass_box.place(relx=0.32,rely=0.45)
+        self.repass_box.place(relx=0.28,rely=0.45)
         self.repass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.scd_password)
-        self.repass_entry.place(relx=0.33,rely=0.46)
+        self.repass_entry.place(relx=0.29,rely=0.46)
 
         
         
         self.reset_label = customtkinter.CTkButton(self.Reset,text='Reset',fg_color='#D9D9D9',hover_color='#F2F2F2',cursor='hand2',command=lambda :reset_pass(self))
-        self.reset_label.place(relx=0.37,rely=0.53)
+        self.reset_label.place(relx=0.32,rely=0.53)
         
 class AddTransaction(Toplevel):
     def __init__(self,window,controller):
         Toplevel.__init__(self,window)
         self.geometry('1000x500')
-        category_list =['Food&Drink','Cars','Home','Travel','Shopping','Salary','Loan','Investment','Saving']
+        category_list =['Food&Drink','Transport','Home','Travel','Shopping','Salary','Loan','Investment','Saving']
         currency_list = ['MYR','USD','CAD','EUR','SG','CNH','JPY','GBP','CHF','AUD']
 
         self.controller= controller
         self.resizable(0,0)
+        self.category_str =  StringVar()
+        self.note_str = StringVar()
+        self.amount_str = IntVar()
+        self.currency_str = StringVar()
 
         def open_calculator(self):
             window = Calculator(self,controller)
@@ -1157,12 +1199,13 @@ class AddTransaction(Toplevel):
 
 
         def add(self):
+
             email = self.controller.shared_email['Login_email'].get()
-            self.category = self.category.get()
-            self.note = self.note.get()
-            self.amount = self.amount.get()
-            self.currency = self.currency.get()
-            self.date = self.date.get_date()
+            self.category = self.category_str.get()
+            self.note = self.note_str.get()
+            self.amount = self.amount_str.get()
+            self.currency = self.currency_str.get()
+            self.date = self.date_str.get_date()
             self.str_date = self.date.strftime("%Y-%m-%d")
 
             conn = sqlite3.connect('money.db')
@@ -1179,25 +1222,24 @@ class AddTransaction(Toplevel):
                 cursor.execute('INSERT INTO Income(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,decimal_amount,'MYR'))
                 conn.commit()
                 mb.showinfo('Success','Commit success')
+                
             elif self.category =='Food&Drink' or self.category == 'Travel' or self.category == 'Cars' or self.category == 'Shopping' or self.category == 'Home':
                 converted_amount = cr.convert(self.currency,'MYR',self.amount)
                 decimal_amount = round(converted_amount,2)
                 cursor.execute('INSERT INTO Expenses(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,decimal_amount,'MYR'))
                 conn.commit()
                 mb.showinfo('Success','Commit success') 
+                
             elif self.category =='Saving' :
                 converted_amount = cr.convert(self.currency,'MYR',self.amount)
                 decimal_amount = round(converted_amount,2)
+              
                 cursor.execute('INSERT INTO Saving(Email,Category,Date,Note,Amount,Currency) VALUES(?,?,?,?,?,?)',(email,self.category,self.str_date,self.note,decimal_amount,'MYR'))
                 conn.commit()
                 mb.showinfo('Success','Commit success')
+                
             else:
                 mb.showerror('Error','Error')
-
-        self.category =  StringVar()
-        self.note = StringVar()
-        self.amount = IntVar()
-        self.currency = StringVar()
         
 
         self.Add = Frame(self,bg='#FFFFFF',height='500',width='1000')
@@ -1205,14 +1247,14 @@ class AddTransaction(Toplevel):
 
         self.category_label = Label(self.Add,text='Category',bg='#FFFFFF',font=labelfont)
         self.category_label.place(relx=0.05,rely=0.05)
-        category = Combobox(self,width=12,values=category_list,state='readonly',textvariable=self.category)
+        category = Combobox(self,width=12,values=category_list,state='readonly',textvariable=self.category_str)
         category.place(relx=0.05,rely=0.12)
 
         self.date_label = Label(self.Add,text='Date',bg='#FFFFFF',font=labelfont)
         self.date_label.place(relx=0.2,rely=0.05)
     
-        self.date=DateEntry(self.Add, font=("Arial", 12), width=12)
-        self.date.place(relx=0.2,rely=0.12)
+        self.date_str=DateEntry(self.Add, font=("Arial", 12), width=12)
+        self.date_str.place(relx=0.2,rely=0.12)
 
         self.note_label = Label(self.Add,text='Note (optional)',bg='#FFFFFF',font=labelfont)
         self.note_label.place(relx=0.37,rely=0.05)
@@ -1221,7 +1263,7 @@ class AddTransaction(Toplevel):
         self.note_img = Label(self.Add,image=note,bg='#FFFFFF')
         self.note_img.image = note
         self.note_img.place(relx=0.37,rely=0.12)
-        note_entry = Entry(self,width=16,bg='#FFFFFF',font=entryfont,highlightthickness=0, relief=FLAT,textvariable=self.note)
+        note_entry = Entry(self,width=16,bg='#FFFFFF',font=entryfont,highlightthickness=0, relief=FLAT,textvariable=self.note_str)
         note_entry.place(relx=0.38,rely=0.125)
 
         self.amount_label = Label(self.Add,text='Amount',bg='#FFFFFF',font=labelfont)
@@ -1231,12 +1273,12 @@ class AddTransaction(Toplevel):
         self.amount_img = Label(self.Add,image=amount,bg='#FFFFFF')
         self.amount_img.image = amount
         self.amount_img.place(relx=0.55,rely=0.12)
-        amount_entry = Entry(self,width=17,bg='#FFFFFF',font=entryfont,highlightthickness=0, relief=FLAT,textvariable=self.amount)
+        amount_entry = Entry(self,width=17,bg='#FFFFFF',font=entryfont,highlightthickness=0, relief=FLAT,textvariable=self.amount_str)
         amount_entry.place(relx=0.56,rely=0.125)
 
         currency_label = Label(self.Add,text='Currency',bg='#FFFFFF',font=labelfont)
         currency_label.place(relx=0.73,rely=0.05)
-        currency = Combobox(self.Add,width=5,values=currency_list,state='readonly',textvariable=self.currency)
+        currency = Combobox(self.Add,width=5,values=currency_list,state='readonly',textvariable=self.currency_str)
         currency.place(relx=0.74,rely=0.125)
 
         self.add_btn = customtkinter.CTkButton(self.Add,text='Add transaction',fg_color='#11DD7B',hover_color='#FFFFFF',border_width=1
@@ -1395,7 +1437,7 @@ class Calculator(Toplevel):
     def __init__(self,window,controller):
         
         Toplevel.__init__(self,window)
-        self.geometry('500x500')
+        self.geometry('500x300')
 
         self.expression = ""
         # be used to store data in memory
@@ -1424,95 +1466,87 @@ class Calculator(Toplevel):
 
         # row 0
         # clears self.expression
-        self.btn_clear = customtkinter.CTkButton(bottom_frame,width=10, border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="C", command=self.btn_clear_all)
+        self.btn_clear = customtkinter.CTkButton(bottom_frame,width=100, border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="C", command=self.btn_clear_all)
         self.btn_clear.grid(row=0, column=4)
         # deletes last string input
-        self.btn_del = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="del", command=self.btn_clear1)
+        self.btn_del = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="del", command=self.btn_clear1)
         self.btn_del.grid(row=0, column=5)
         # inputs a negative sign to the next entry
-        self.btn_change_sign = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text=chr(177), command=self.change_signs)
+        self.btn_change_sign = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text=chr(177), command=self.change_signs)
         self.btn_change_sign.grid(row=0, column=6)
         # division
-        self.btn_div = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="/", command=lambda: self.btn_click('/'))
+        self.btn_div = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="/", command=lambda: self.btn_click('/'))
         self.btn_div.grid(row=0, column=7)
         # stores previous expression as an answer value
-        self.btn_ans = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="ans", command=self.answer)
+        self.btn_ans = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="ans", command=self.answer)
         self.btn_ans.grid(row=0, column=8)
 
         # row 1
         # seven
-        self.btn_7 = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="7", command=lambda: self.btn_click(7))
+        self.btn_7 = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="7", command=lambda: self.btn_click(7))
         
         self.btn_7.grid(row=1, column=4)
         # eight
-        self.btn_8 = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="8", command=lambda: self.btn_click(8))
+        self.btn_8 = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="8", command=lambda: self.btn_click(8))
         
         self.btn_8.grid(row=1, column=5)
         # nine
-        self.btn_9 = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="9", command=lambda: self.btn_click(9))
+        self.btn_9 = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="9", command=lambda: self.btn_click(9))
         
         self.btn_9.grid(row=1, column=6)
         # multiplication
-        self.btn_mult = customtkinter.CTkButton(bottom_frame,width=10, border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="x", command=lambda: self.btn_click('*'))
+        self.btn_mult = customtkinter.CTkButton(bottom_frame,width=100, border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="x", command=lambda: self.btn_click('*'))
         self.btn_mult.grid(row=1, column=7)
         # 'memory clear' button. Wipes self.recall to an empty string
-        self.btn_MC = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="MC", command=self.memory_clear)
-        self.btn_MC.grid(row=1, column=8)
-
+       
         # row 2
         # four
-        self.btn_4 = customtkinter.CTkButton(bottom_frame,width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="4", command=lambda: self.btn_click(4))
+        self.btn_4 = customtkinter.CTkButton(bottom_frame,width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="4", command=lambda: self.btn_click(4))
         
         self.btn_4.grid(row=2, column=4)
         # five
-        self.btn_5 = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="5", command=lambda: self.btn_click(5))
+        self.btn_5 = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="5", command=lambda: self.btn_click(5))
         
         self.btn_5.grid(row=2, column=5)
         # six
-        self.btn_6 = customtkinter.CTkButton(bottom_frame,width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="6", command=lambda: self.btn_click(6))
+        self.btn_6 = customtkinter.CTkButton(bottom_frame,width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="6", command=lambda: self.btn_click(6))
         
         self.btn_6.grid(row=2, column=6)
         # subtraction
-        self.btnSub = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="-", command=lambda: self.btn_click('-'))
+        self.btnSub = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="-", command=lambda: self.btn_click('-'))
         self.btnSub.grid(row=2, column=7)
-        # outputs what is in self.recall
-        self.btn_MR = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="MR", command=self.memory_recall)
-        self.btn_MR.grid(row=2, column=8)
+     
 
         # row 3
         # one
-        self.btn_1 = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="1", command=lambda: self.btn_click(1))
+        self.btn_1 = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="1", command=lambda: self.btn_click(1))
         
         self.btn_1.grid(row=3, column=4)
         # two
-        self.btn_2 = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="2", command=lambda: self.btn_click(2))
+        self.btn_2 = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="2", command=lambda: self.btn_click(2))
         
         self.btn_2.grid(row=3, column=5)
         # three
-        self.btn_3 = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="3", command=lambda: self.btn_click(3))
+        self.btn_3 = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="3", command=lambda: self.btn_click(3))
         self.btn_3.grid(row=3, column=6)
         # addition
-        self.btn_add = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="+", command=lambda: self.btn_click('+'))
+        self.btn_add = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="+", command=lambda: self.btn_click('+'))
         self.btn_add.grid(row=3, column=7)
-        # adds current self.expression to self.recall string
-        self.btn_M_plus = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="M+", command=self.memory_add)
-        self.btn_M_plus.grid(row=3, column=8)
+       
 
         # row 4
         # zero
-        self.btn_0 = customtkinter.CTkButton(bottom_frame,width=10, border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="0", command=lambda: self.btn_click(0))
+        self.btn_0 = customtkinter.CTkButton(bottom_frame,width=100, border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="0", command=lambda: self.btn_click(0))
         
         self.btn_0.grid(row=4, column=4, columnspan=2)
         # equals button
-        self.btn_eq = customtkinter.CTkButton(bottom_frame,width=10, border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="=", command=self.btn_equal)
+        self.btn_eq = customtkinter.CTkButton(bottom_frame,width=100, border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="=", command=self.btn_equal)
     
         self.btn_eq.grid(row=4, column=6)
         # decimal to convert to float
-        self.btn_dec = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text=".", command=lambda: self.btn_click('.'))
+        self.btn_dec = customtkinter.CTkButton(bottom_frame, width=100,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text=".", command=lambda: self.btn_click('.'))
         self.btn_dec.grid(row=4, column=7)
-        # subtracts current self.expression to self.recall string
-        self.btn_M_sub = customtkinter.CTkButton(bottom_frame, width=10,border_width=1, fg_color='#FFFFFF', bg_color='#F2F2F2', text="M-", command=self.memory_minus)
-        self.btn_M_sub.grid(row=4, column=8)
+
 
     # functions
     # allows button you click to be put into self.expression
