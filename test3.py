@@ -22,13 +22,16 @@ import numpy as np
 import re
 from forex_python.converter import CurrencyRates
 import customtkinter
+import pyautogui
+from tkinter.filedialog import *
+import webbrowser
+import csv
+from tkinter import filedialog
+
 # Make a regular expression
 # for validating an Email
 #Regular Expression, is a sequence of characters that forms a search pattern. 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-
-
-
 
 labelfont=("yu gothic ui",14)
 entryfont=("yu gothic ui",14)
@@ -323,7 +326,7 @@ class AnswerSQWin(Frame):
                     mb.showinfo('Success','Answered Correctly')
                     self.controller.show_frame(ResetPass)
                 else:
-                    mb.showerror('Error','Please try again')
+                    mb.showerror('Error','Please fill up the answer')
 
         # =================================
         self.SQuestion = StringVar()
@@ -426,7 +429,11 @@ class Homepage(Frame):
         self.controller=controller
         self.hide_button = None
 
-       
+        def takeSc():
+            self.myScreenshot=pyautogui.screenshot()
+            save_path=asksaveasfilename()
+            self.myScreenshot.save(save_path+"_screenshot.png")
+
 
         def open_add(self):
             window = AddTransaction(self,controller)
@@ -496,7 +503,7 @@ class Homepage(Frame):
             
 
             chart1 = FigureCanvasTkAgg(fig,self.a_frame)
-            chart1.get_tk_widget().place(relx=0.17,rely=0.01)
+            chart1.get_tk_widget().place(relx=0.175,rely=0.01)
            
             #============= Expenses chart =============#
             cursor.execute('''SELECT SUM(Amount)
@@ -575,7 +582,7 @@ class Homepage(Frame):
             
 
             chart2 = FigureCanvasTkAgg(fig,self.b_frame)
-            chart2.get_tk_widget().place(relx=0.17,rely=0.01)
+            chart2.get_tk_widget().place(relx=0.175,rely=0.01)
 
             #=============== Saving chart =============#
             cursor.execute('''SELECT SUM(Amount)
@@ -609,7 +616,7 @@ class Homepage(Frame):
             
 
             chart3 = FigureCanvasTkAgg(fig,self.c_frame)
-            chart3.get_tk_widget().place(relx=0.17,rely=0.01)
+            chart3.get_tk_widget().place(relx=0.175,rely=0.01)
             
              
 
@@ -694,6 +701,10 @@ class Homepage(Frame):
 
         self.reset =customtkinter.CTkButton(self,width=100,text='Reset',fg_color='#FFFFFF',hover_color='#F2F2F2',command= lambda:reset(self))
         self.reset.place(x=850,y=125)
+
+        self.show = customtkinter.CTkButton(self, width=100, text='Screenshot',fg_color='#FFFFFF',hover_color='#F2F2F2', command=takeSc)
+        self.show.place(x=1000, y=125)
+
         
         
         self.add = customtkinter.CTkButton(self, text='Add Transaction', fg_color='#11DD7B',
@@ -887,7 +898,7 @@ class Homepage(Frame):
         self.acc.place(x=70, y=8)
         self.ac = Label(self.agn_button_label, text='',textvariable=saving, font=('yu gothic ui', 13, 'bold'), width=10,
                          bd=0,
-                         bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#C11B17')
+                         bg='#FFFFFF', cursor='hand2', activebackground='#FFFFFF', fg='#000000')
         self.ac.place(x=330, y=8)
 
         self.agn_button = Image.open('images/1.jpg')
@@ -895,7 +906,6 @@ class Homepage(Frame):
         self.agn_button_label = Label(self.c_frame, image=photo, bg='#000000')
         self.agn_button_label.image = photo
         self.agn_button_label.place(x=20, y=320)
-
 
 class AccountPage(Frame):
     def __init__(self, window, controller):
@@ -987,7 +997,7 @@ class AccountPage(Frame):
         self.email_entry_label = Label(self.accountcard_frame,image=img,bg='#ffffff')
         self.email_entry_label.image=img
         self.email_entry_label.place(relx=0.5,rely=0.33)
-        self.email_entry = Entry(self.accountcard_frame,width=19,bg='#D9D9D9',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.email_strvar)
+        self.email_entry = Entry(self.accountcard_frame,width=21,bg='#D9D9D9',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.email_strvar)
         self.email_entry.place(relx=0.51,rely=0.345)
         self.email_entry.config(state='disabled')
 
@@ -1004,7 +1014,6 @@ class AccountPage(Frame):
                                 width=100,height=40,cursor='hand2',border_width=1,command=lambda:controller.show_frame(ValidEmail))
         self.reset_label.place(relx=0.63,rely=0.81)
         
-
 class ValidEmail(Frame):
     def __init__(self, window,controller):
         Frame.__init__(self, window)
@@ -1045,7 +1054,6 @@ class ValidEmail(Frame):
         self.next_label = customtkinter.CTkButton(self.Valid,text='Next',fg_color='#FFFFFF',hover_color='#F2F2F2',cursor='hand2',border_width=1,width=100,height=40,command=lambda:valid_email(self))
         self.next_label.place(relx=0.33,rely=0.43)
         
-
 class SecurityQuestion(Frame):
     def __init__(self, window,controller):
         Frame.__init__(self, window)
@@ -1162,7 +1170,7 @@ class ResetPass(Frame):
         self.pass_box = Label(self.Reset,image=pass_box_img,bg='#FFFFFF')
         self.pass_box.image=pass_box_img
         self.pass_box.place(relx=0.28,rely=0.35)
-        self.pass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.password)
+        self.pass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.password,show='*')
         self.pass_entry.place(relx=0.29,rely=0.36)
 
         self.repass_label =Label(self.Reset,text='Confirm Password',bg='#FFFFFF',font=labelfont)
@@ -1171,7 +1179,7 @@ class ResetPass(Frame):
         self.repass_box = Label(self.Reset,image=pass_box_img,bg='#FFFFFF')
         self.repass_box.image=pass_box_img
         self.repass_box.place(relx=0.28,rely=0.45)
-        self.repass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.scd_password)
+        self.repass_entry = Entry(self.Reset,width=29,bg='#FFFFFF',font= entryfont,highlightthickness=0, relief=FLAT,textvariable=self.scd_password,show='*')
         self.repass_entry.place(relx=0.29,rely=0.46)
 
         
@@ -1301,6 +1309,25 @@ class TransactionTable(Frame):
             if answer:
                 self.controller.show_frame(LoginForm)
         
+        def create_csv():
+            conn=sqlite3.connect('money.db')
+            curr=conn.execute('''SELECT Email,Category,Date,Note,Amount,Currency FROM Income  WHERE Email =?''',(self.controller.shared_email['Login_email'].get(),))
+            result1 = curr.fetchall()
+            curr=conn.execute('''SELECT Email,Category,Date,Note,Amount,Currency FROM Expenses  WHERE Email =?''',(self.controller.shared_email['Login_email'].get(),))
+            result2 = curr.fetchall()
+            curr=conn.execute('''SELECT Email,Category,Date,Note,Amount,Currency FROM Expenses  WHERE Email =?''',(self.controller.shared_email['Login_email'].get(),))
+            result3 = curr.fetchall()
+
+            final = result1 + result2 + result3
+            print(final)
+            
+            filename = filedialog.asksaveasfilename(initialdir=os.getcwd(),defaultextension=".csv",title='Save csv',filetypes=(('CSV File','*.csv'),('All Files','*.*')))
+            with open(filename,'a') as f:
+                w =csv.writer(f,delimiter=',')
+                for i in final:
+                    w.writerow(i)
+            mb.showinfo('Success','The file has been exported to'+os.path.basename(filename)+'successfully.')   
+
         def display_record(self):
             email = self.controller.shared_email['Login_email'].get()
             self.tree.delete(*self.tree.get_children())
@@ -1311,6 +1338,10 @@ class TransactionTable(Frame):
             for record in data:
                 self.tree.insert('',END,values=record)
             cursor.execute('SELECT Transaction_ID,Category,Date,Note,Amount,Currency FROM Expenses WHERE Email =?',(email,))
+            data =cursor.fetchall()
+            for record in data:
+                self.tree.insert('',END,values=record)
+            cursor.execute('SELECT Transaction_ID,Category,Date,Note,Amount,Currency FROM Saving WHERE Email =?',(email,))
             data =cursor.fetchall()
             for record in data:
                 self.tree.insert('',END,values=record)
@@ -1396,16 +1427,19 @@ class TransactionTable(Frame):
         self.log_out_label.bind('<Button-1>',lambda e:log_out(self))
 
         self.show = customtkinter.CTkButton(self.table_frame,width=100,text='Show',fg_color='#FFFFFF',hover_color='#F2F2F2',border_width=1,command=lambda:display_record(self))
-        self.show.place(x=200,y=60)
+        self.show.place(x=300,y=60)
 
         self.delete_record= customtkinter.CTkButton(self.table_frame,width=100,text='Delete',fg_color='#FFFFFF',hover_color='#F2F2F2',border_width=1,command=lambda :delete_record(self))
-        self.delete_record.place(x=350,y=60)
+        self.delete_record.place(x=400,y=60)
+
+        self.download= customtkinter.CTkButton(self.table_frame,width=100,text='Download',fg_color='#FFFFFF',hover_color='#F2F2F2',border_width=1,command=create_csv)
+        self.download.place(x=500,y=60)
 
         self.search_category= customtkinter.CTkButton(self.table_frame,width=100,text='Search',fg_color='#FFFFFF',hover_color='#F2F2F2',border_width=1,command=lambda :search_by_category(self))
-        self.search_category.place(x=490,y=60)
+        self.search_category.place(x=600,y=60)
 
         self.category_list = Combobox(self.table_frame,width=10,textvariable=self.category,values=category_list,state='readonly')
-        self.category_list.place(x=620,y=65)
+        self.category_list.place(x=700,y=65)
 
         self.tree = Treeview(self.table_frame, height=100, selectmode=BROWSE,
                                 columns=('Transaction_ID','Category', 'Date', "Note","Amount", "Currency" ))
@@ -1421,17 +1455,14 @@ class TransactionTable(Frame):
         self.tree.heading('Amount', text='Amount', anchor=CENTER)
         self.tree.heading('Currency', text='Currency', anchor=CENTER)
 
-
         self.tree.column('#0', width=0, stretch=NO,anchor=CENTER)
-        self.tree.column('#1', width=120, stretch=NO,anchor=CENTER)
-        self.tree.column('#2', width=100, stretch=NO,anchor=CENTER)
-        self.tree.column('#3', width=150, stretch=NO,anchor=CENTER)
-        self.tree.column('#4', width=80, stretch=NO,anchor=CENTER)
-        self.tree.column('#5', width=80, stretch=NO,anchor=CENTER)
-        self.tree.column('#6', width=80, stretch=NO,anchor=CENTER)
-
-       
-        self.tree.place(x=120,y=120, relwidth=1, relheight=0.9, relx=0)
+        self.tree.column('#1', width=200, stretch=NO,anchor=CENTER)
+        self.tree.column('#2', width=200, stretch=NO,anchor=CENTER)
+        self.tree.column('#3', width=200, stretch=NO,anchor=CENTER)
+        self.tree.column('#4', width=200, stretch=NO,anchor=CENTER)
+        self.tree.column('#5', width=200, stretch=NO,anchor=CENTER)
+        self.tree.column('#6', width=200, stretch=NO,anchor=CENTER)
+        self.tree.place(x=100,y=120, relwidth=1, relheight=0.9, relx=0)
        
 class Calculator(Toplevel):
     def __init__(self,window,controller):
@@ -1731,6 +1762,19 @@ class Tip(Frame):
             Label(self.content_frame,text='fees and prioritizes essential spending. A strong on-time payment history can also lift your credit score and improve your',bg='#FFFFFF',font=labelfnt).place(relx=0.1,rely=0.58)
             Label(self.content_frame,text='interest rates.',bg='#FFFFFF',font=labelfnt).place(relx=0.1,rely=0.61)
 
+            Label(self.content_frame,text='More related atricle:',bg='#FFFFFF',font=headfnt).place(relx=0.1,rely=0.67)
+
+            self.article1 = Label(self.content_frame,text='1.Beginner’s guide to managing your money',cursor='hand2',font=labelfnt,bg='#FFFFFF')
+            self.article1.place(relx=0.1,rely=0.7)
+            self.article1.bind('<Button-1>',lambda e: webbrowser.open_new_tab('https://www.moneyhelper.org.uk/en/everyday-money/budgeting/beginners-guide-to-managing-your-money'))
+
+            self.article2 = Label(self.content_frame,text='2.8 Financial Tips for Young Adults',cursor='hand2',font=labelfnt,bg='#FFFFFF')
+            self.article2.place(relx=0.1,rely=0.74)
+            self.article2.bind('<Button-1>',lambda e: webbrowser.open_new_tab('https://www.investopedia.com/articles/younginvestors/08/eight-tips.asp'))
+
+            self.article2 = Label(self.content_frame,text='3.Top 10 Money Management Tips',cursor='hand2',font=labelfnt,bg='#FFFFFF')
+            self.article2.place(relx=0.1,rely=0.78)
+            self.article2.bind('<Button-1>',lambda e: webbrowser.open_new_tab('https://smartasset.com/checking-account/top-10-money-management-tips'))
 
         self.tip_frame =Frame(self,bg='#FFFFFF',width='1500',height='800')
         self.tip_frame.place(rely=0.1)
@@ -1783,8 +1827,6 @@ class Tip(Frame):
         self.manage = customtkinter.CTkButton(self.menu_frame,text='Manage Money',width=300,height=40,fg_color='#FFFFFF'
                                                 ,hover_color='#F2F2F2',cursor='hand2',border_width=1,command=lambda :manage_money(self))
         self.manage.place(relx=0.1,rely=0.35)
-
-
 
 def page():
     app =windows()
